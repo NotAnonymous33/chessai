@@ -17,11 +17,19 @@ pygame.display.set_caption("Chess by Ismail Choudhury")
 
 
 while running:
+    pos = (-1, -1)
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             running = False
-    board.draw()
+        if event.type == pygame.MOUSEBUTTONUP:
+            pos = pygame.mouse.get_pos()
 
+    board.set_selected(pos)
+
+
+
+
+    board.draw()
     pygame.display.flip()
 
 
