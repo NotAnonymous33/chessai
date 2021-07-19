@@ -8,11 +8,11 @@ class Cell:
     def __init__(self, window, coor):
         self.x = coor[0]
         self.y = coor[1]
-        self.color = [RCOLOR, LCOLOR][(self.x + self.y) % 2]
+        self.color = [LCOLOR, RCOLOR][(self.x + self.y) % 2]
         self.window = window
 
     def draw(self):
-        pygame.draw.rect(self.window, self.color, [self.x * WIDTH, self.y * WIDTH, WIDTH, WIDTH])
+        pygame.draw.rect(self.window, self.color, [self.x * CLENGTH, self.y * CLENGTH, CLENGTH, CLENGTH])
 
 
 class Board:
