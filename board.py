@@ -5,7 +5,7 @@ pygame.init()
 
 
 class Cell:
-    def __init__(self, window, coor):
+    def __init__(self, window: pygame.display, coor: tuple):
         self.x = coor[0]
         self.y = coor[1]
         self.xcor1 = self.x * CLENGTH
@@ -21,7 +21,7 @@ class Cell:
 
 
 class Board:
-    def __init__(self, window):
+    def __init__(self, window: pygame.display):
         self.extra = Cell(window, (9, 9))
         self.cells = [[Cell(window, (i, j)) for j in range(8)] for i in range(8)]
         self.window = window
@@ -32,11 +32,13 @@ class Board:
             for cell in row:
                 cell.draw()
 
-    def set_selected(self, pos):
+    def set_selected(self, pos: tuple):
         for row in self.cells:
             for cell in row:
                 if cell.xcor1 < pos[0] < cell.xcor2 and cell.ycor1 < pos[1] < cell.ycor2:
-                    self.current_selected.selected = False
-                    cell.selected = True
-                    self.current_selected = cell
-
+                    if self.current_selected == cell:
+                        cell.selected = False
+                    else:
+                        self.current_selected.selected = False
+                        cell.selected = True
+                        self.current_selected = cell
