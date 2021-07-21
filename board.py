@@ -54,27 +54,11 @@ class Cell:
 class Board:
     def __init__(self):
         self.cells = [[Cell((i, j)) for j in range(8)] for i in range(8)]
-        self.pieces = [
-            Piece(PieceColor.BLACK, PieceType.ROOK, (0, 0)),
-            Piece(PieceColor.BLACK, PieceType.KNIGHT, (1, 0)),
-            Piece(PieceColor.BLACK, PieceType.BISHOP, (2, 0)),
-            Piece(PieceColor.BLACK, PieceType.QUEEN, (3, 0)),
-            Piece(PieceColor.BLACK, PieceType.KING, (4, 0)),
-            Piece(PieceColor.BLACK, PieceType.BISHOP, (5, 0)),
-            Piece(PieceColor.BLACK, PieceType.KNIGHT, (6, 0)),
-            Piece(PieceColor.BLACK, PieceType.ROOK, (7, 0))
-        ] + [Piece(PieceColor.BLACK, PieceType.PAWN, (i, 1)) for i in range(8)] + [
-            Piece(PieceColor.WHITE, PieceType.PAWN, (i, 6)) for i in range(8)
-        ] + [
-            Piece(PieceColor.WHITE, PieceType.ROOK, (0, 7)),
-            Piece(PieceColor.WHITE, PieceType.KNIGHT, (1, 7)),
-            Piece(PieceColor.WHITE, PieceType.BISHOP, (2, 7)),
-            Piece(PieceColor.WHITE, PieceType.QUEEN, (3, 7)),
-            Piece(PieceColor.WHITE, PieceType.KING, (4, 7)),
-            Piece(PieceColor.WHITE, PieceType.BISHOP, (5, 7)),
-            Piece(PieceColor.WHITE, PieceType.KNIGHT, (6, 7)),
-            Piece(PieceColor.WHITE, PieceType.ROOK, (7, 7)),
-        ]
+        self.pieces = [Piece(PieceColor.BLACK, pieces_order[i], (i, 0)) for i in range(8)] + \
+                      [Piece(PieceColor.BLACK, PieceType.PAWN, (i, 1)) for i in range(8)] + \
+                      [Piece(PieceColor.WHITE, PieceType.PAWN, (i, 6)) for i in range(8)] + \
+                      [Piece(PieceColor.WHITE, pieces_order[i], (i, 7)) for i in range(8)]
+
 
     def draw(self):
         for row in self.cells:
