@@ -4,8 +4,6 @@ from constants import *
 
 pygame.init()
 
-
-
 clock = pygame.time.Clock()
 
 board = Board()
@@ -15,7 +13,7 @@ running = True
 pygame.display.set_caption("Chess by Ismail Choudhury")
 
 
-
+# game loop
 while running:
     pos = None
     for event in pygame.event.get():
@@ -25,11 +23,11 @@ while running:
             pos = pygame.mouse.get_pos()
 
     if pos is not None:
-        board.set_selected(pos)
+        board.clicked(pos)
 
 
 
-
+    # drawing
     board.draw()
     pygame.display.flip()
 
