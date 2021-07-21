@@ -5,9 +5,11 @@ from enum import Enum, auto
 
 pygame.init()
 
+
 class PieceColor(Enum):
     BLACK = "b"
     WHITE = "w"
+
 
 class PieceType(Enum):
     PAWN = "p"
@@ -17,24 +19,24 @@ class PieceType(Enum):
     QUEEN = "Q"
     KING = "K"
 
+
+pieces_order = [PieceType.ROOK, PieceType.KNIGHT, PieceType.BISHOP, PieceType.QUEEN, PieceType.KING, PieceType.BISHOP, PieceType.KNIGHT, PieceType.ROOK]
+
+
 class Piece:
-    def __init__(self, window, piece_color: PieceColor, piece_type: PieceType, coor: tuple):
-        self.window = window
+    def __init__(self, piece_color: PieceColor, piece_type: PieceType, coor: tuple):
         self.piece_color = piece_color
         self.piece_type = piece_type
         self.xcoor = coor[0]
         self.ycoor = coor[1]
         self.image = IMAGES[self.piece_color.value + self.piece_type.value]
 
-
-
     def draw(self):
-        self.window.blit(self.image, (self.xcoor * CLENGTH, self.ycoor * CLENGTH))
-
+        WIN.blit(self.image, (self.xcoor * CLENGTH, self.ycoor * CLENGTH))
 
 
 class Cell:
-    def __init__(self, window: pygame.display, coor: tuple):
+    def __init__(self, coor: tuple):
         self.x = coor[0]
         self.y = coor[1]
         self.xcor1 = self.x * CLENGTH
@@ -42,37 +44,44 @@ class Cell:
         self.ycor1 = self.y * CLENGTH
         self.ycor2 = self.y * CLENGTH + CLENGTH
         self.color = [LCOLOR, RCOLOR][(self.x + self.y) % 2]
-        self.window = window
         self.selected = False
         self.piece = None
 
     def draw(self):
-        pygame.draw.rect(self.window, [self.color, SCOLOR][self.selected], [self.x * CLENGTH, self.y * CLENGTH, CLENGTH, CLENGTH])
+        pygame.draw.rect(WIN, [self.color, SCOLOR][self.selected], [self.xcor1, self.ycor1, CLENGTH, CLENGTH])
 
 
 class Board:
-    def __init__(self, window: pygame.display):
-        self.cells = [[Cell(window, (i, j)) for j in range(8)] for i in range(8)]
-        self.window = window
+    def __init__(self):
+        self.cells = [[Cell((i, j)) for j in range(8)] for i in range(8)]
         self.pieces = [
-            [],
-            [Piece(self.window, PieceColor.BLACK, PieceType.PAWN, (i, 1)) for i in range(8)],
-            [],
-            [],
-            [],
-            [],
-            [Piece(self.window, PieceColor.WHITE, PieceType.PAWN, (i, 6)) for i in range(8)],
-            []
+            Piece(PieceColor.BLACK, PieceType.ROOK, (0, 0)),
+            Piece(PieceColor.BLACK, PieceType.KNIGHT, (1, 0)),
+            Piece(PieceColor.BLACK, PieceType.BISHOP, (2, 0)),
+            Piece(PieceColor.BLACK, PieceType.QUEEN, (3, 0)),
+            Piece(PieceColor.BLACK, PieceType.KING, (4, 0)),
+            Piece(PieceColor.BLACK, PieceType.BISHOP, (5, 0)),
+            Piece(PieceColor.BLACK, PieceType.KNIGHT, (6, 0)),
+            Piece(PieceColor.BLACK, PieceType.ROOK, (7, 0))
+        ] + [Piece(PieceColor.BLACK, PieceType.PAWN, (i, 1)) for i in range(8)] + [
+            Piece(PieceColor.WHITE, PieceType.PAWN, (i, 6)) for i in range(8)
+        ] + [
+            Piece(PieceColor.WHITE, PieceType.ROOK, (0, 7)),
+            Piece(PieceColor.WHITE, PieceType.KNIGHT, (1, 7)),
+            Piece(PieceColor.WHITE, PieceType.BISHOP, (2, 7)),
+            Piece(PieceColor.WHITE, PieceType.QUEEN, (3, 7)),
+            Piece(PieceColor.WHITE, PieceType.KING, (4, 7)),
+            Piece(PieceColor.WHITE, PieceType.BISHOP, (5, 7)),
+            Piece(PieceColor.WHITE, PieceType.KNIGHT, (6, 7)),
+            Piece(PieceColor.WHITE, PieceType.ROOK, (7, 7)),
         ]
 
     def draw(self):
         for row in self.cells:
             for cell in row:
                 cell.draw()
-        for row in self.pieces:
-            for piece in row:
-                piece.draw()
-
+        for piece in self.pieces:
+            piece.draw()
 
     def set_selected(self, pos: tuple):
         for row in self.cells:

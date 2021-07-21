@@ -5,10 +5,10 @@ from constants import *
 pygame.init()
 
 
-WIN = pygame.display.set_mode((TLENGTH, TLENGTH))
+
 clock = pygame.time.Clock()
 
-board = Board(WIN)
+board = Board()
 
 running = True
 
