@@ -45,18 +45,16 @@ class Cell:
         self.ycor2 = self.y * CLENGTH + CLENGTH
         self.color = [LCOLOR, RCOLOR][(self.x + self.y) % 2]
         self.selected = False
+        self.highlighted = False
         self.piece = None
 
     def draw(self):
-        # draw a square with color [self.color, SCOLOR][self.selected]
-        '''
-        if self.selected == True, when converted to a number it is evaluted to be 1
-        This will then index element 1 (the second element which is the color for selected cells)
-        otherwise self.selected is False which is converted to 0
-        This will index element 0, the first element which is the default color of the cell
-
-        '''
-        pygame.draw.rect(WIN, [self.color, SCOLOR][self.selected], [self.xcor1, self.ycor1, CLENGTH, CLENGTH])
+        color = self.color
+        if self.highlighted:
+            color = HCOLOR
+        elif self.selected:
+            color = SCOLOR
+        pygame.draw.rect(WIN, color, [self.xcor1, self.ycor1, CLENGTH, CLENGTH])
 
 
 class Board:
@@ -91,18 +89,27 @@ class Board:
                     cell.selected = False
 
         # if there is no current selected piece and a piece is clicked, set this as the current piece
-        if not self.piece_selected:
-            for piece in self.pieces:
-                if piece.xcoor == pos[0] // CLENGTH and piece.ycoor == pos[1] // CLENGTH:
-                    if not self.piece_selected:
-                        self.selected_piece = piece
-                        print(self.selected_piece.piece_color, self.selected_piece.piece_type)
-                        self.piece_selected = True
-        # if there is a selected piece, change the position to the clicked position
-        else:
-            self.selected_piece.xcoor = pos[0] // CLENGTH
-            self.selected_piece.ycoor = pos[1] // CLENGTH
+        # if somewhere outside of board is clicked
+        if (not 0 <= pos[0] // CLENGTH <= 7) or not(0 <= pos[1] // CLENGTH <= 7):
+            for row in self.cells:
+                for cell in row:
+                    cell.selected = False
             self.piece_selected = False
+        else:
+            if not self.piece_selected:
+                for piece in self.pieces:
+                    if piece.xcoor == pos[0] // CLENGTH and piece.ycoor == pos[1] // CLENGTH:
+                        if not self.piece_selected:
+                            self.selected_piece = piece
+                            print(self.selected_piece.piece_color, self.selected_piece.piece_type)
+                            self.piece_selected = True
+            # if there is a selected piece, change the position to the clicked position
+            else:
+                self.selected_piece.xcoor = pos[0] // CLENGTH
+                self.selected_piece.ycoor = pos[1] // CLENGTH
+                self.piece_selected = False
+                self.cells[pos[0] // CLENGTH][pos[1] // CLENGTH].selected = False
 
-
+    def highlight_cells(self, piece):
+        pass
 
