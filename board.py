@@ -34,6 +34,9 @@ class Piece:
     def draw(self):
         WIN.blit(self.image, (self.x * CLENGTH, self.y * CLENGTH))
 
+    def __repr__(self):
+        return f"{self.piece_color} {self.piece_type}"
+
 
 class Cell:
     def __init__(self, coor: tuple, piece=None):
@@ -73,6 +76,7 @@ class Board:
         ]
         self.selected_piece = None
         self.piece_selected = False
+        self.selected_cell = None
 
     # draw the board
     def draw(self):
@@ -83,40 +87,13 @@ class Board:
 
     # function for when board has been clicked
     def clicked(self, pos: tuple):
-        # change the color of the cell which has been selected
-        # set all other cells to default color
-        for row in self.cells:
-            for cell in row:
-                if cell.xcor1 < pos[0] < cell.xcor2 and cell.ycor1 < pos[1] < cell.ycor2:
-                    cell.selected = not cell.selected
-                else:
-                    cell.selected = False
-
-        # if there is no current selected piece and a piece is clicked, set this as the current piece
-        # if somewhere outside of board is clicked
-
-        '''
-        if (not 0 <= pos[0] // CLENGTH <= 7) or not(0 <= pos[1] // CLENGTH <= 7):
-            for row in self.cells:
-                for cell in row:
-                    cell.selected = False
-            self.piece_selected = False
-        else:
-            if not self.piece_selected:
-                for piece in self.pieces:
-                    if piece.xcoor == pos[0] // CLENGTH and piece.ycoor == pos[1] // CLENGTH:
-                        if not self.piece_selected:
-                            self.selected_piece = piece
-                            print(self.selected_piece.piece_color, self.selected_piece.piece_type)
-                            self.piece_selected = True
-            # if there is a selected piece, change the position to the clicked position
-            else:
-                self.selected_piece.xcoor = pos[0] // CLENGTH
-                self.selected_piece.ycoor = pos[1] // CLENGTH
-                self.piece_selected = False
-                self.cells[pos[0] // CLENGTH][pos[1] // CLENGTH].selected = False
-        '''
+        pass
 
     def highlight_cells(self, piece):
         pass
+
+    def unselect_all_cells(self):
+        for row in self.cells:
+            for cell in row:
+                cell.selected = False
 
