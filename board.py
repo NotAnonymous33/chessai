@@ -24,19 +24,19 @@ pieces_order = [PieceType.ROOK, PieceType.KNIGHT, PieceType.BISHOP, PieceType.QU
 
 
 class Piece:
-    def __init__(self, piece_color: PieceColor, piece_type: PieceType, coor: tuple):
+    def __init__(self, piece_color: PieceColor, piece_type: PieceType, board_coor: tuple):
         self.piece_color = piece_color
         self.piece_type = piece_type
-        self.xcoor = coor[0]
-        self.ycoor = coor[1]
+        self.x = board_coor[0]
+        self.y = board_coor[1]
         self.image = IMAGES[self.piece_color.value + self.piece_type.value]
 
     def draw(self):
-        WIN.blit(self.image, (self.xcoor * CLENGTH, self.ycoor * CLENGTH))
+        WIN.blit(self.image, (self.x * CLENGTH, self.y * CLENGTH))
 
 
 class Cell:
-    def __init__(self, coor: tuple):
+    def __init__(self, coor: tuple, piece=None):
         self.x = coor[0]
         self.y = coor[1]
         self.xcor1 = self.x * CLENGTH
@@ -46,7 +46,7 @@ class Cell:
         self.color = [LCOLOR, RCOLOR][(self.x + self.y) % 2]
         self.selected = False
         self.highlighted = False
-        self.piece = None
+        self.piece = piece
 
     def draw(self):
         color = self.color
@@ -55,15 +55,22 @@ class Cell:
         elif self.selected:
             color = SCOLOR
         pygame.draw.rect(WIN, color, [self.xcor1, self.ycor1, CLENGTH, CLENGTH])
+        if self.piece is not None:
+            self.piece.draw()
 
 
 class Board:
     def __init__(self):
-        self.cells = [[Cell((i, j)) for j in range(8)] for i in range(8)]
-        self.pieces = [Piece(PieceColor.BLACK, pieces_order[i], (i, 0)) for i in range(8)] + \
-                      [Piece(PieceColor.BLACK, PieceType.PAWN, (i, 1)) for i in range(8)] + \
-                      [Piece(PieceColor.WHITE, PieceType.PAWN, (i, 6)) for i in range(8)] + \
-                      [Piece(PieceColor.WHITE, pieces_order[i], (i, 7)) for i in range(8)]
+        self.cells = [
+            [Cell((i, 0), Piece(PieceColor.BLACK, pieces_order[i], (i, 0))) for i in range(8)],  # Black pieces
+            [Cell((i, 1), Piece(PieceColor.BLACK, PieceType.PAWN, (i, 1))) for i in range(8)],  # Black pawns
+            [Cell((i, 2)) for i in range(8)],  # Empty
+            [Cell((i, 3)) for i in range(8)],  # Empty
+            [Cell((i, 4)) for i in range(8)],  # Empty
+            [Cell((i, 5)) for i in range(8)],  # Empty
+            [Cell((i, 6), Piece(PieceColor.WHITE, PieceType.PAWN, (i, 6))) for i in range(8)],  # White pawns
+            [Cell((i, 7), Piece(PieceColor.WHITE, pieces_order[i], (i, 7))) for i in range(8)]   # White pieces
+        ]
         self.selected_piece = None
         self.piece_selected = False
 
@@ -73,9 +80,6 @@ class Board:
         for row in self.cells:
             for cell in row:
                 cell.draw()
-        # draw each piece
-        for piece in self.pieces:
-            piece.draw()
 
     # function for when board has been clicked
     def clicked(self, pos: tuple):
@@ -90,6 +94,8 @@ class Board:
 
         # if there is no current selected piece and a piece is clicked, set this as the current piece
         # if somewhere outside of board is clicked
+
+        '''
         if (not 0 <= pos[0] // CLENGTH <= 7) or not(0 <= pos[1] // CLENGTH <= 7):
             for row in self.cells:
                 for cell in row:
@@ -109,6 +115,7 @@ class Board:
                 self.selected_piece.ycoor = pos[1] // CLENGTH
                 self.piece_selected = False
                 self.cells[pos[0] // CLENGTH][pos[1] // CLENGTH].selected = False
+        '''
 
     def highlight_cells(self, piece):
         pass
