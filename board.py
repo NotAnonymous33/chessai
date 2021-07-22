@@ -61,6 +61,8 @@ class Cell:
         if self.piece is not None:
             self.piece.draw()
 
+    def __repr__(self):
+        return f"({self.piece}) at ({self.x}, {self.y})"
 
 class Board:
     def __init__(self):
@@ -77,6 +79,7 @@ class Board:
         self.selected_piece = None
         self.piece_selected = False
         self.selected_cell = None
+        self.cell_selected = False
 
     # draw the board
     def draw(self):
@@ -87,7 +90,53 @@ class Board:
 
     # function for when board has been clicked
     def clicked(self, pos: tuple):
+        if not (0 < pos[0] < TLENGTH and 0 < pos[1] < TLENGTH):
+            self.reset_selected()
+        else:
+            x = pos[0] // CLENGTH
+            y = pos[1] // CLENGTH
+            if self.cell_selected:
+                self.selected_cell.selected = False
+            else:
+                self.selected_cell = self.cells[y][x]
+                self.selected_cell.selected = True
+            self.cell_selected = not self.cell_selected
+
+
+        print(self.selected_piece)
+
+
+
+        """
+        // If the click is outside the range of the board, set everything to default values
+        Otherwise:
+            Things that happen when there is a click on a cell
+            
+            //If there is a selected cell
+            //    do some stuff
+            //if there is not a selected cell
+            //    Set the clicked cell to the selected cell
+            
+            //If the cell is selected, set this cell to off
+            //If the cell is not selected, set the selected cell to off and select this cell
+            
+            
+            If there is a selected piece
+                Move to the cell to the new cell
+            
+            If there is not a selected piece
+                If there is a piece in the cell, set the piece as the current piece
+                If there is not a piece in the cell, set the current piece to None
+    
+
+        """
+
         pass
+
+    def reset_selected(self):
+        self.selected_piece = None
+        self.piece_selected = False
+        self.selected_cell = None
 
     def highlight_cells(self, piece):
         pass
