@@ -16,24 +16,24 @@ def main():
 
     # game loop
     while running:
-        pos = None
         for event in pygame.event.get():
-            if event.type == pygame.QUIT:
+            if event.type == pygame.QUIT or board.check_quit():
                 running = False
+
             if event.type == pygame.MOUSEBUTTONUP:
                 pos = pygame.mouse.get_pos()
+                board.click(pos[0], pos[1])
 
-        if pos is not None:
-            board.clicked(pos)
+        pos = pygame.mouse.get_pos()
 
-        # drawing
         board.draw()
         pygame.display.flip()
-
         clock.tick(FPS)
 
 
-main()
+if __name__ == "__main__":
+    main()
+
 
 pygame.quit()
 
