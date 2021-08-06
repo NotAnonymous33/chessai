@@ -135,7 +135,8 @@ class Board:
             return
 
         # there is a source cell
-        if self.source_coord in self.highlighted_cells:
+
+        if (xc, yc) in self.highlighted_cells:
             self.move_piece(xc, yc)
         self.reset_source()
 
@@ -179,10 +180,6 @@ class Board:
                 self.highlighted_cells.append((x + 1, y - self.turn))
 
 
-
-
-
-
     def check_bishop(self):
         pass
 
@@ -213,4 +210,8 @@ class Board:
         self.highlighted_cells = []
 
     def move_piece(self, x, y):
-        pass
+        self.pieces[y][x] = self.pieces[self.source_coord[1]][self.source_coord[0]]
+        self.pieces[y][x].moved = True
+        self.pieces[self.source_coord[1]][self.source_coord[0]] = Empty()  # set the source piece to 0
+        self.turn *= -1
+
