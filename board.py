@@ -159,12 +159,11 @@ class Board:
     def highlight_pawn(self):
         x, y = self.source_coord
         # if the piece in front is empty add that cell
-        # if the piece to corners is opposite, add
         if self.pieces[y - self.turn][x].color.value == 0:
             self.highlighted_cells.append((x, y - self.turn))
 
         # if the pawn hasn't moved, let it move 2 moves forward
-        if not self.pieces[y][x].moved and self.pieces[y - 2 * self.turn][x].color.value == 0:
+        if not self.pieces[y][x].moved and self.pieces[y - 2 * self.turn][x].color.value == self.pieces[y - self.turn][x].color.value == 0:
             self.highlighted_cells.append((x, y - 2 * self.turn))
 
         # if the piece to the left and right corner are opposite color, add them to highlighted piece
