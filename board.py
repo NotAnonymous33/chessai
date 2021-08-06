@@ -144,20 +144,19 @@ class Board:
     def highlight_cells(self):
         x, y = self.source_coord  # really do be wishing python 3.10 were here
         if self.pieces[y][x].piece_type == PieceType.PAWN:
-            self.check_pawn()
+            self.highlight_pawn()
         elif self.pieces[y][x].piece_type == PieceType.BISHOP:
-            self.check_bishop()
+            self.highlight_bishop()
         elif self.pieces[y][x].piece_type == PieceType.KNIGHT:
-            self.check_knight()
+            self.highlight_knight()
         elif self.pieces[y][x].piece_type == PieceType.ROOK:
-            self.check_rook()
+            self.highlight_rook()
         elif self.pieces[y][x].piece_type == PieceType.QUEEN:
-            self.check_queen()
+            self.highlight_queen()
         elif self.pieces[y][x].piece_type == PieceType.KING:
-            self.check_king()
+            self.highlight_king()
 
-
-    def check_pawn(self):
+    def highlight_pawn(self):
         x, y = self.source_coord
         # if the piece in front is empty add that cell
         # if the piece to corners is opposite, add
@@ -179,27 +178,42 @@ class Board:
             if self.pieces[y - self.turn][x + 1].color.value == self.turn * -1:
                 self.highlighted_cells.append((x + 1, y - self.turn))
 
-
-    def check_bishop(self):
+    def highlight_bishop(self):
         pass
 
-    def check_knight(self):
+    def highlight_knight(self):
+        x, y = self.source_coord
+        # 2 right 1 up
+        self.check_knight(2, -1)
+        # 2 right 1 down
+        self.check_knight(2, 1)
+        # 1 right 2 up
+        self.check_knight(1, -2)
+        # 1 right 2 down
+        self.check_knight(1, 2)
+        # 2 left 1 up
+        self.check_knight(-2, -1)
+        # 2 left 1 down
+        self.check_knight(-2, 1)
+        # 1 left 2 up
+        self.check_knight(-1, -2)
+        # 1 left 2 down
+        self.check_knight(-1, 2)
+
+    def check_knight(self, dx, dy):
+        x, y = self.source_coord
+        if not (0 <= x + dx <= 7): return
+        if not (0 <= y + dy <= 7): return
+        if self.pieces[y + dy][x + dx].color.value != self.turn:  # 2 right 1 up
+            self.highlighted_cells.append((x + dx, y + dy))
+
+    def highlight_queen(self):
         pass
 
-    def check_queen(self):
+    def highlight_rook(self):
         pass
 
-    def check_rook(self):
-        pass
-
-    def check_king(self):
-        pass
-
-    # check if the piece will cause check
-    def check_move(self):
-        pass
-
-    def check_check(self):
+    def highlight_king(self):
         pass
 
     def check_quit(self):
