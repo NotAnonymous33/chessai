@@ -109,7 +109,8 @@ class Board:
             pygame.draw.rect(WIN, HCOLOR, [coord[0] * CLENGTH, coord[1] * CLENGTH, CLENGTH, CLENGTH])
 
         # draw selected square
-        pygame.draw.rect(WIN, SCOLOR, [self.source_coord[0] * CLENGTH, self.source_coord[1] * CLENGTH, CLENGTH, CLENGTH])
+        pygame.draw.rect(WIN, SCOLOR,
+                         [self.source_coord[0] * CLENGTH, self.source_coord[1] * CLENGTH, CLENGTH, CLENGTH])
 
         # draw pieces
         for row_num in range(NUM_ROWS):
@@ -161,7 +162,8 @@ class Board:
             self.highlighted_cells.add((x, y - self.turn))
 
         # if the pawn hasn't moved, let it move 2 moves forward
-        if not self.pieces[y][x].moved and self.pieces[y - 2 * self.turn][x].color.value == self.pieces[y - self.turn][x].color.value == 0:
+        if not self.pieces[y][x].moved and self.pieces[y - 2 * self.turn][x].color.value == self.pieces[y - self.turn][
+            x].color.value == 0:
             self.highlighted_cells.add((x, y - 2 * self.turn))
 
         # if the piece to the left and right corner are opposite color, add them to highlighted piece
@@ -199,8 +201,6 @@ class Board:
                 self.highlighted_cells.add((x + dx, y + dy))
             dy += d2y
             dx += d2x
-
-
 
     def highlight_knight(self):
         # 2 right 1 up
@@ -296,14 +296,28 @@ class Board:
 
     def highlight_king(self):
         # check up
+        self.check_king(0, -1)
         # check down
+        self.check_king(0, 1)
         # check left
+        self.check_king(-1, 0)
         # check right
+        self.check_king(1, 0)
         # check up right
+        self.check_king(1, -1)
         # check up left
+        self.check_king(-1, -1)
         # check down right
+        self.check_king(1, 1)
         # check down left
-        pass
+        self.check_king(-1, 1)
+
+    def check_king(self, dx, dy):
+        x, y = self.source_coord
+        if not (0 <= y + dy <= 7 and 0 <= x + dx <= 7):
+            return
+        if self.pieces[y + dy][x + dx].color.value != self.turn:
+            self.highlighted_cells.add((x + dx, y + dy))
 
     def check_quit(self):
         return False
