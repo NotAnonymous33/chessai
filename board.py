@@ -176,7 +176,31 @@ class Board:
                 self.highlighted_cells.add((x + 1, y - self.turn))
 
     def highlight_bishop(self):
-        pass
+        # top right
+        self.check_bishop(1, -1)
+        # top left
+        self.check_bishop(-1, -1)
+        # bottom right
+        self.check_bishop(1, 1)
+        # bottom left
+        self.check_bishop(-1, 1)
+
+    def check_bishop(self, d2x, d2y):
+        x, y = self.source_coord
+        dx, dy = d2x, d2y
+        stop = False
+        while 0 <= x + dx <= 7 and 0 <= y + dy <= 7 and not stop:
+            if self.pieces[y + dy][x + dx].color.value == self.turn * -1:
+                stop = True
+                self.highlighted_cells.add((x + dx, y + dy))
+            elif self.pieces[y + dy][x + dx].color.value == self.turn:
+                stop = True
+            else:
+                self.highlighted_cells.add((x + dx, y + dy))
+            dy += d2y
+            dx += d2x
+
+
 
     def highlight_knight(self):
         # 2 right 1 up
