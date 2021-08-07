@@ -229,6 +229,7 @@ class Board:
 
     def highlight_queen(self):
         self.highlight_rook()
+        self.highlight_bishop()
 
     def highlight_rook(self):
         x, y = self.source_coord
