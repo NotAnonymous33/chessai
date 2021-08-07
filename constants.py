@@ -4,7 +4,8 @@ pygame.init()
 LCOLOR = (240, 230, 220)
 RCOLOR = (199, 117, 61)
 SCOLOR = (0, 255, 255)
-HCOLOR = (0, 181, 98)  # (127, 255, 0)
+HDCOLOR = (0, 181, 98)  # (127, 255, 0)
+HLCOLOR = (0, 255, 150)
 TLENGTH = 600
 CLENGTH = TLENGTH // 8
 NUM_ROWS = 8

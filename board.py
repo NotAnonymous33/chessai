@@ -106,7 +106,9 @@ class Board:
 
         # draw highlighted squares
         for coord in self.highlighted_cells:
-            pygame.draw.rect(WIN, HCOLOR, [coord[0] * CLENGTH, coord[1] * CLENGTH, CLENGTH, CLENGTH])
+            color = HLCOLOR
+            if (coord[0] + coord[1]) % 2: color = HDCOLOR
+            pygame.draw.rect(WIN, color, [coord[0] * CLENGTH, coord[1] * CLENGTH, CLENGTH, CLENGTH])
 
         # draw selected square
         pygame.draw.rect(WIN, SCOLOR,
