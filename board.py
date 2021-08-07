@@ -1,4 +1,4 @@
-import pygame
+# import pygame
 from constants import *
 from aenum import Enum as AEnum
 from aenum import NoAlias
@@ -96,7 +96,7 @@ class Board:
         ]
         self.source_coord = (-1, -1)
         self.turn = 1
-        self.highlighted_cells = []
+        self.highlighted_cells = set([])
 
     def draw(self):
         # draw the squares of the board
@@ -135,11 +135,9 @@ class Board:
             return
 
         # there is a source cell
-
         if (xc, yc) in self.highlighted_cells:
             self.move_piece(xc, yc)
         self.reset_source()
-
 
     def highlight_cells(self):
         x, y = self.source_coord  # really do be wishing python 3.10 were here
@@ -160,28 +158,27 @@ class Board:
         x, y = self.source_coord
         # if the piece in front is empty add that cell
         if self.pieces[y - self.turn][x].color.value == 0:
-            self.highlighted_cells.append((x, y - self.turn))
+            self.highlighted_cells.add((x, y - self.turn))
 
         # if the pawn hasn't moved, let it move 2 moves forward
         if not self.pieces[y][x].moved and self.pieces[y - 2 * self.turn][x].color.value == self.pieces[y - self.turn][x].color.value == 0:
-            self.highlighted_cells.append((x, y - 2 * self.turn))
+            self.highlighted_cells.add((x, y - 2 * self.turn))
 
         # if the piece to the left and right corner are opposite color, add them to highlighted piece
         # left hand side
         if x != 0:
             if self.pieces[y - self.turn][x - 1].color.value == self.turn * -1:
-                self.highlighted_cells.append((x - 1, y - self.turn))
+                self.highlighted_cells.add((x - 1, y - self.turn))
 
         # right hand side
         if x != 7:
             if self.pieces[y - self.turn][x + 1].color.value == self.turn * -1:
-                self.highlighted_cells.append((x + 1, y - self.turn))
+                self.highlighted_cells.add((x + 1, y - self.turn))
 
     def highlight_bishop(self):
         pass
 
     def highlight_knight(self):
-        x, y = self.source_coord
         # 2 right 1 up
         self.check_knight(2, -1)
         # 2 right 1 down
@@ -204,15 +201,83 @@ class Board:
         if not (0 <= x + dx <= 7): return
         if not (0 <= y + dy <= 7): return
         if self.pieces[y + dy][x + dx].color.value != self.turn:  # 2 right 1 up
-            self.highlighted_cells.append((x + dx, y + dy))
+            self.highlighted_cells.add((x + dx, y + dy))
 
     def highlight_queen(self):
-        pass
+        self.highlight_rook()
 
     def highlight_rook(self):
-        pass
+        x, y = self.source_coord
+        right = left = up = down = True
+
+        difference = 1
+        while right:
+            if difference + x <= 7:
+                if self.pieces[y][x + difference].color.value == self.turn * -1:
+                    self.highlighted_cells.add((x + difference, y))
+                    right = False
+                elif self.pieces[y][x + difference].color.value == self.turn:
+                    right = False
+                else:
+                    self.highlighted_cells.add((x + difference, y))
+                difference += 1
+            else:
+                right = False
+
+        # look left
+        difference = -1
+        while left:
+            if difference + x >= 0:
+                if self.pieces[y][x + difference].color.value == self.turn * -1:
+                    self.highlighted_cells.add((x + difference, y))
+                    left = False
+                elif self.pieces[y][x + difference].color.value == self.turn:
+                    left = False
+                else:
+                    self.highlighted_cells.add((x + difference, y))
+                difference -= 1
+            else:
+                left = False
+
+        # look up
+        difference = -1
+        while up:
+            if difference + y >= 0:
+                if self.pieces[y + difference][x].color.value == self.turn * -1:
+                    self.highlighted_cells.add((x, y + difference))
+                    up = False
+                elif self.pieces[y + difference][x].color.value == self.turn:
+                    up = False
+                else:
+                    self.highlighted_cells.add((x, y + difference))
+                difference -= 1
+            else:
+                up = False
+
+        difference = 1
+        # look down
+        while down:
+            if difference + y <= 7:
+                if self.pieces[y + difference][x].color.value == self.turn * -1:
+                    self.highlighted_cells.add((x, y + difference))
+                    down = False
+                elif self.pieces[y + difference][x].color.value == self.turn:
+                    down = False
+                else:
+                    self.highlighted_cells.add((x, y + difference))
+                difference += 1
+            else:
+                down = False
 
     def highlight_king(self):
+        # check up
+        # check down
+        # check left
+        # check right
+        # check up right
+        # check up left
+        # check down right
+        # check down left
         pass
 
     def check_quit(self):
@@ -220,11 +285,10 @@ class Board:
 
     def reset_source(self):
         self.source_coord = (-1, -1)
-        self.highlighted_cells = []
+        self.highlighted_cells = set([])
 
     def move_piece(self, x, y):
         self.pieces[y][x] = self.pieces[self.source_coord[1]][self.source_coord[0]]
         self.pieces[y][x].moved = True
         self.pieces[self.source_coord[1]][self.source_coord[0]] = Empty()  # set the source piece to 0
         self.turn *= -1
-
