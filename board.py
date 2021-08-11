@@ -1,8 +1,8 @@
 # import pygame
 from constants import *
-from aenum import Enum as AEnum
+from aenum import Enum
 from aenum import NoAlias
-from enum import Enum
+from copy import copy
 
 pygame.init()
 
@@ -13,8 +13,9 @@ class PieceColor(Enum):
     EMPTY = 0
 
 
-class PieceType(AEnum):
+class PieceType(Enum):
     _settings_ = NoAlias
+    EMPTY = 0
     PAWN = 1
     ROOK = 5
     BISHOP = 3
@@ -73,6 +74,7 @@ class Cell:
 class Empty:
     def __init__(self):
         self.color = PieceColor.EMPTY
+        self.piece_type = PieceType.EMPTY
 
     def __repr__(self):
         return "empty"
@@ -97,6 +99,7 @@ class Board:
         self.source_coord = (-1, -1)
         self.turn = 1
         self.highlighted_cells = set([])
+        self.check = False
 
     def draw(self):
         # draw the squares of the board
@@ -133,6 +136,11 @@ class Board:
             if self.pieces[yc][xc].color.value == self.turn:  # if a cell with a piece is clicked
                 self.source_coord = (xc, yc)  # set the clicked piece as the source piece
                 self.highlight_cells()
+                '''
+                For each highlighted cell, make move
+                If after move, still in check
+                Remove move
+                '''
             else:
                 self.reset_source()
             return
@@ -234,67 +242,28 @@ class Board:
         self.highlight_bishop()
 
     def highlight_rook(self):
+        self.check_rook(1, 0)  # look right
+        self.check_rook(-1, 0)  # look left
+        self.check_rook(0, 1)  # look down
+        self.check_rook(0, -1)  # look up
+
+    def check_rook(self, d2x, d2y):
+        condition = True
+        dx = d2x
+        dy = d2y
         x, y = self.source_coord
-        right = left = up = down = True
-
-        difference = 1
-        while right:
-            if difference + x <= 7:
-                if self.pieces[y][x + difference].color.value == self.turn * -1:
-                    self.highlighted_cells.add((x + difference, y))
-                    right = False
-                elif self.pieces[y][x + difference].color.value == self.turn:
-                    right = False
-                else:
-                    self.highlighted_cells.add((x + difference, y))
-                difference += 1
+        while True:
+            if not (0 <= x + dx <= 7 and 0 <= y +  dy <= 7):
+                return
+            if self.pieces[y + dy][x + dx].color.value == self.turn * -1:
+                self.highlighted_cells.add((x + dx, y + dy))
+                return
+            elif self.pieces[y + dy][x + dx].color.value == self.turn:
+                return
             else:
-                right = False
-
-        # look left
-        difference = -1
-        while left:
-            if difference + x >= 0:
-                if self.pieces[y][x + difference].color.value == self.turn * -1:
-                    self.highlighted_cells.add((x + difference, y))
-                    left = False
-                elif self.pieces[y][x + difference].color.value == self.turn:
-                    left = False
-                else:
-                    self.highlighted_cells.add((x + difference, y))
-                difference -= 1
-            else:
-                left = False
-
-        # look up
-        difference = -1
-        while up:
-            if difference + y >= 0:
-                if self.pieces[y + difference][x].color.value == self.turn * -1:
-                    self.highlighted_cells.add((x, y + difference))
-                    up = False
-                elif self.pieces[y + difference][x].color.value == self.turn:
-                    up = False
-                else:
-                    self.highlighted_cells.add((x, y + difference))
-                difference -= 1
-            else:
-                up = False
-
-        difference = 1
-        # look down
-        while down:
-            if difference + y <= 7:
-                if self.pieces[y + difference][x].color.value == self.turn * -1:
-                    self.highlighted_cells.add((x, y + difference))
-                    down = False
-                elif self.pieces[y + difference][x].color.value == self.turn:
-                    down = False
-                else:
-                    self.highlighted_cells.add((x, y + difference))
-                difference += 1
-            else:
-                down = False
+                self.highlighted_cells.add((x + dx, y + dy))
+                dx += d2x
+                dy += d2y
 
     def highlight_king(self):
         # check up
@@ -332,4 +301,44 @@ class Board:
         self.pieces[y][x] = self.pieces[self.source_coord[1]][self.source_coord[0]]
         self.pieces[y][x].moved = True
         self.pieces[self.source_coord[1]][self.source_coord[0]] = Empty()  # set the source piece to 0
+        print(self.evaluate())
+
+        self.check = self.is_check()
+        print(self.check)
+
+        '''
+        If king is under attack, check
+        For each piece
+            Select piece
+            If king is in higlighted cells
+                check = True
+                break 
+        For each move opponent can make
+            Make move
+            If not in check anymore:
+                break
+        else:
+            checkmate, end the game
+        
+        '''
         self.turn *= -1
+
+    def is_check(self):
+        for row_num in range(NUM_ROWS):
+            for col_num in range(NUM_ROWS):
+                if self.pieces[row_num][col_num].color.value != self.turn:
+                    continue
+                self.source_coord = (col_num, row_num)
+                self.highlight_cells()
+                for coord in self.highlighted_cells:
+                    x, y = coord
+                    if self.pieces[y][x].piece_type == PieceType.KING and self.pieces[y][x].color.value != self.turn:
+                        return True
+        return False
+
+    def evaluate(self):
+        e = 0
+        for row in self.pieces:
+            e += sum(map(lambda x : x.color.value * x.piece_type.value, row))
+            # e += piece.color.value * piece.piece_type.value
+        return e
