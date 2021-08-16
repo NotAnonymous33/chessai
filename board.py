@@ -305,6 +305,7 @@ class Board:
 
         self.check = self.is_check()
         print(self.check)
+        print(self.opponent_check())
 
         '''
         If king is under attack, check
@@ -334,6 +335,23 @@ class Board:
                     x, y = coord
                     if self.pieces[y][x].piece_type == PieceType.KING and self.pieces[y][x].color.value != self.turn:
                         return True
+        return False
+
+    def opponent_check(self):
+        self.turn *= -1
+        for row_num in range(NUM_ROWS):
+            for col_num in range(NUM_ROWS):
+                if self.pieces[row_num][col_num].color.value != self.turn:
+                    continue
+                self.reset_source()
+                self.source_coord = (col_num, row_num)
+                self.highlight_cells()
+                for coord in self.highlighted_cells:
+                    x, y = coord
+                    if self.pieces[y][x].piece_type == PieceType.KING and self.pieces[y][x].color.value != self.turn:
+                        self.turn *= -1
+                        return True
+        self.turn *= -1
         return False
 
     def evaluate(self):
