@@ -2,7 +2,7 @@
 from constants import *
 from aenum import Enum
 from aenum import NoAlias
-from copy import copy
+from copy import copy, deepcopy
 
 pygame.init()
 
@@ -100,6 +100,7 @@ class Board:
         self.turn = 1
         self.highlighted_cells = set([])
         self.check = False
+        self.quit = False
 
     def draw(self):
         # draw the squares of the board
@@ -135,7 +136,7 @@ class Board:
         if self.source_coord == (-1, -1):
             if self.pieces[yc][xc].color.value == self.turn:  # if a cell with a piece is clicked
                 self.source_coord = (xc, yc)  # set the clicked piece as the source piece
-                self.highlight_cells()
+                self.highlight_cells(True)
                 '''
                 For each highlighted cell, make move
                 If after move, still in check
@@ -147,10 +148,11 @@ class Board:
 
         # there is a source cell
         if (xc, yc) in self.highlighted_cells:
-            self.move_piece(xc, yc)
+            self.move_piece(xc, yc, True)
         self.reset_source()
 
-    def highlight_cells(self):
+    def highlight_cells(self, recur=False):
+        self.highlighted_cells = set([])
         x, y = self.source_coord  # really do be wishing python 3.10 were here
         if self.pieces[y][x].piece_type == PieceType.PAWN:
             self.highlight_pawn()
@@ -164,6 +166,21 @@ class Board:
             self.highlight_queen()
         elif self.pieces[y][x].piece_type == PieceType.KING:
             self.highlight_king()
+
+        if recur:
+            new_moves = set([])
+            for move in self.highlighted_cells:
+                new_board = copy(self)
+                new_board.pieces = [row[:] for row in self.pieces]
+                new_board.highlighted_cells = deepcopy(self.highlighted_cells)
+                new_board.move_piece(*move)
+                # self.turn *= -1
+                if not new_board.is_check():
+                    new_moves.add(move)
+            self.highlighted_cells = new_moves
+
+        self.highlighted_cells.discard((x, y))
+
 
     def highlight_pawn(self):
         x, y = self.source_coord
@@ -291,27 +308,31 @@ class Board:
             self.highlighted_cells.add((x + dx, y + dy))
 
     def check_quit(self):
-        return False
+        return self.quit
 
     def reset_source(self):
         self.source_coord = (-1, -1)
         self.highlighted_cells = set([])
 
-    def move_piece(self, x, y):
+    def move_piece(self, x, y, first=False):
         self.pieces[y][x] = self.pieces[self.source_coord[1]][self.source_coord[0]]
         self.pieces[y][x].moved = True
         self.pieces[self.source_coord[1]][self.source_coord[0]] = Empty()  # set the source piece to 0
-        print(self.evaluate())
 
         self.check = self.is_check()
-        print(self.check)
-        print(self.opponent_check())
+
+        self.turn *= -1
+
+        if self.check and first:
+            self.check_checkmate()
+
+
 
         '''
         If king is under attack, check
         For each piece
             Select piece
-            If king is in higlighted cells
+            If king is in highlighted cells
                 check = True
                 break 
         For each move opponent can make
@@ -322,7 +343,18 @@ class Board:
             checkmate, end the game
         
         '''
-        self.turn *= -1
+
+    def check_checkmate(self):
+        for row_num in range(NUM_ROWS):
+            for col_num in range(NUM_ROWS):
+                if self.pieces[row_num][col_num].color.value != self.turn: continue
+                self.source_coord = (col_num, row_num)
+                self.highlight_cells(True)
+                if self.highlighted_cells != set([]): return
+        print("chekmate noob")
+        self.quit = True
+
+
 
     def is_check(self):
         for row_num in range(NUM_ROWS):
