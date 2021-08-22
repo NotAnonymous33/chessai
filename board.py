@@ -333,6 +333,11 @@ class Board:
 
     def move_piece(self, x, y, first=False):
         px, py = self.source_coord
+        if self.pieces[py][px].piece_type == PieceType.KING:
+            if x - px == 2:
+                self.pieces[y][5] = self.pieces[y][7]
+                self.pieces[y][5].moved = True
+                self.pieces[y][7] = Empty()
 
         self.pieces[y][x] = self.pieces[self.source_coord[1]][self.source_coord[0]]
         self.pieces[y][x].moved = True
