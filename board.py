@@ -82,7 +82,6 @@ class Empty:
     def draw(self, *args, **kwargs):
         pass
 
-
 class Board:
     def __init__(self):
         self.cells = [[Cell(col, row) for col in range(NUM_ROWS)] for row in range(NUM_ROWS)]
@@ -167,11 +166,22 @@ class Board:
         elif self.pieces[y][x].piece_type == PieceType.KING:
             self.highlight_king()
 
+        moved = []
+        for row in self.pieces:
+            temp = []
+            for piece in row:
+                if not isinstance(piece, Empty):
+                    temp.append(piece.moved)
+                else:
+                    temp.append(None)
+            moved.append(temp)
+
+
         if recur:
             new_moves = set([])
             for move in self.highlighted_cells:
                 new_board = copy(self)
-                new_board.pieces = [row[:] for row in self.pieces]
+                new_board.pieces = [copy(row) for row in self.pieces]
                 new_board.highlighted_cells = deepcopy(self.highlighted_cells)
                 new_board.move_piece(*move)
                 # self.turn *= -1
@@ -179,8 +189,12 @@ class Board:
                     new_moves.add(move)
             self.highlighted_cells = new_moves
 
-
         self.highlighted_cells.discard((x, y))
+
+        for row_num in range(NUM_ROWS):
+            for col_num in range(NUM_ROWS):
+                if self.pieces[row_num][col_num] != Empty():
+                    self.pieces[row_num][col_num].moved = moved[row_num][col_num]
 
     def highlight_pawn(self):
         x, y = self.source_coord
@@ -290,11 +304,13 @@ class Board:
         self.check_king(-1, -1)  # check up left
         self.check_king(1, 1)  # check down right
         self.check_king(-1, 1)  # check down left
-        # add castling to right
-        x, y = self.source_coord
 
+        x, y = self.source_coord
+        # add castling to right
         if self.check:
             return
+        if x != 4:
+            pass
         if not(self.pieces[y][x].moved == False == self.pieces[y][x+3].moved):
             return
         if not(self.pieces[y][x+1].color.value == self.pieces[y][x+2].color.value == 0):
@@ -316,6 +332,8 @@ class Board:
         self.highlighted_cells = set([])
 
     def move_piece(self, x, y, first=False):
+        px, py = self.source_coord
+
         self.pieces[y][x] = self.pieces[self.source_coord[1]][self.source_coord[0]]
         self.pieces[y][x].moved = True
         self.pieces[self.source_coord[1]][self.source_coord[0]] = Empty()  # set the source piece to 0
@@ -359,7 +377,6 @@ class Board:
         self.quit = True
 
     def is_check(self):
-
         for row_num in range(NUM_ROWS):
             for col_num in range(NUM_ROWS):
                 if self.pieces[row_num][col_num].color.value != self.turn:
