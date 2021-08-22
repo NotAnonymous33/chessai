@@ -55,7 +55,7 @@ class Piece:
         WIN.blit(self.image, (x * CLENGTH, y * CLENGTH))
 
     def __repr__(self):
-        return f"{self.color} {self.piece_type}"
+        return f"{self.color} {self.piece_type}, {self.moved=}"
 
 
 class Cell:
@@ -179,8 +179,8 @@ class Board:
                     new_moves.add(move)
             self.highlighted_cells = new_moves
 
-        self.highlighted_cells.discard((x, y))
 
+        self.highlighted_cells.discard((x, y))
 
     def highlight_pawn(self):
         x, y = self.source_coord
@@ -265,12 +265,11 @@ class Board:
         self.check_rook(0, -1)  # look up
 
     def check_rook(self, d2x, d2y):
-        condition = True
         dx = d2x
         dy = d2y
         x, y = self.source_coord
         while True:
-            if not (0 <= x + dx <= 7 and 0 <= y +  dy <= 7):
+            if not (0 <= x + dx <= 7 and 0 <= y + dy <= 7):
                 return
             if self.pieces[y + dy][x + dx].color.value == self.turn * -1:
                 self.highlighted_cells.add((x + dx, y + dy))
@@ -283,22 +282,24 @@ class Board:
                 dy += d2y
 
     def highlight_king(self):
-        # check up
-        self.check_king(0, -1)
-        # check down
-        self.check_king(0, 1)
-        # check left
-        self.check_king(-1, 0)
-        # check right
-        self.check_king(1, 0)
-        # check up right
-        self.check_king(1, -1)
-        # check up left
-        self.check_king(-1, -1)
-        # check down right
-        self.check_king(1, 1)
-        # check down left
-        self.check_king(-1, 1)
+        self.check_king(0, -1)  # check up
+        self.check_king(0, 1)  # check down
+        self.check_king(-1, 0)  # check left
+        self.check_king(1, 0)  # check right
+        self.check_king(1, -1)  # check up right
+        self.check_king(-1, -1)  # check up left
+        self.check_king(1, 1)  # check down right
+        self.check_king(-1, 1)  # check down left
+        # add castling to right
+        x, y = self.source_coord
+
+        if self.check:
+            return
+        if not(self.pieces[y][x].moved == False == self.pieces[y][x+3].moved):
+            return
+        if not(self.pieces[y][x+1].color.value == self.pieces[y][x+2].color.value == 0):
+            return
+        self.highlighted_cells.add((x + 2, y))
 
     def check_king(self, dx, dy):
         x, y = self.source_coord
@@ -319,7 +320,10 @@ class Board:
         self.pieces[y][x].moved = True
         self.pieces[self.source_coord[1]][self.source_coord[0]] = Empty()  # set the source piece to 0
 
+        current = self.source_coord
+
         self.check = self.is_check()
+        self.source_coord = current
 
         self.turn *= -1
 
@@ -351,12 +355,11 @@ class Board:
                 self.source_coord = (col_num, row_num)
                 self.highlight_cells(True)
                 if self.highlighted_cells != set([]): return
-        print("chekmate noob")
+        print("checkmate noob")
         self.quit = True
 
-
-
     def is_check(self):
+
         for row_num in range(NUM_ROWS):
             for col_num in range(NUM_ROWS):
                 if self.pieces[row_num][col_num].color.value != self.turn:
