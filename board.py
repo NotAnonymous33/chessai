@@ -307,15 +307,18 @@ class Board:
 
         x, y = self.source_coord
         # add castling to right
-        if self.check:
+        if self.check:  # no castling allowed if in check
             return
-        if x != 4:
-            pass
-        if not(self.pieces[y][x].moved == False == self.pieces[y][x+3].moved):
-            return
-        if not(self.pieces[y][x+1].color.value == self.pieces[y][x+2].color.value == 0):
-            return
-        self.highlighted_cells.add((x + 2, y))
+        if self.pieces[y][x].moved: return  # no castling allowed if king has moved
+
+        if not self.pieces[y][7].moved and (self.pieces[y][x+1].color.value == self.pieces[y][x+2].color.value == 0):
+            self.highlighted_cells.add((x + 2, y))
+
+        if not self.pieces[y][7].moved and (self.pieces[y][x-1].color.value == self.pieces[y][x-2].color.value == self.pieces[y][x-3].color.value == 0):
+            self.highlighted_cells.add((x - 2, y))
+            self.highlighted_cells.add((x - 3, y))
+
+
 
     def check_king(self, dx, dy):
         x, y = self.source_coord
@@ -334,10 +337,18 @@ class Board:
     def move_piece(self, x, y, first=False):
         px, py = self.source_coord
         if self.pieces[py][px].piece_type == PieceType.KING:
-            if x - px == 2:
-                self.pieces[y][5] = self.pieces[y][7]
-                self.pieces[y][5].moved = True
-                self.pieces[y][7] = Empty()
+            if abs((d := x - px)) == 2:
+                d //= 2
+                rookx = max([0, d] * 7)
+                self.pieces[y][px+d] = self.pieces[y][rookx]
+                self.pieces[y][px+d].moved = True
+                self.pieces[y][rookx] = Empty()
+
+            if px - x == 3:
+                self.pieces[y][2] = self.pieces[y][0]
+                self.pieces[y][2].moved = True
+                self.pieces[y][0] = Empty()
+
 
         self.pieces[y][x] = self.pieces[self.source_coord[1]][self.source_coord[0]]
         self.pieces[y][x].moved = True
