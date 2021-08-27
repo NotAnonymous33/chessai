@@ -50,6 +50,8 @@ class Piece:
 
         # image of piece
         self.image = IMAGES[img]
+        if y == 8:
+            self.image = NIMAGES[ba[x]]
         self.moved = False
 
     def draw(self, x, y):
@@ -82,6 +84,7 @@ class Empty:
 
     def draw(self, *args, **kwargs):
         pass
+
 
 class Board:
     def __init__(self):
@@ -129,6 +132,11 @@ class Board:
             for col_num in range(NUM_ROWS):
                 self.pieces[row_num][col_num].draw(col_num, row_num)
 
+        if self.promote:
+            for i in range(4):
+                piece = Piece(i, 8)
+                piece.draw(i, 8)
+
     def click(self, xpos, ypos):
         xc = xpos // CLENGTH
         yc = ypos // CLENGTH
@@ -141,7 +149,11 @@ class Board:
         x, y = self.source_coord
         if y % 7 == 0 and self.pieces[y][x].piece_type == PieceType.PAWN:
             self.highlight_cells(True)
-            print("time to promote")
+            print("promoting")
+            self.move_piece(xc, yc, True)
+            self.reset_source()
+            return
+
 
         # if there isn't a source cell
         if self.source_coord == (-1, -1):
@@ -344,7 +356,11 @@ class Board:
 
         px, py = self.source_coord
 
-        if self.pieces[py][px].piece_type == PieceType.PAWN and y % 7 == 0:
+        if self.promote:
+            self.pieces[py][px] = Piece(x, 7 * self.turn)
+            self.pieces[py][px].moved = False
+            self.promote = False
+        elif self.pieces[py][px].piece_type == PieceType.PAWN and y % 7 == 0:
             # wait for input from user asking which piece to turn into
             self.pieces[y][x] = self.pieces[py][px]
             self.pieces[py][px] = Empty()
