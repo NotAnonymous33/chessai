@@ -29,6 +29,7 @@ pieces_order = [PieceType.ROOK, PieceType.KNIGHT, PieceType.BISHOP, PieceType.QU
 pieces_order_char = ["R", "N", "B", "Q", "K", "B", "N", "R"]
 
 
+
 class Piece:
     def __init__(self, x, y):
         # sorting out color of piece
@@ -100,11 +101,17 @@ class Board:
         self.highlighted_cells = set([])
         self.check = False
         self.quit = False
+        self.promote = False
 
     def draw(self):
         # draw the squares of the board
         for row in self.cells:
             for cell in row:
+                cell.draw()
+
+        if self.promote:
+            for i in range(4):
+                cell = Cell(i, 8)
                 cell.draw()
 
         # draw highlighted squares
@@ -127,9 +134,14 @@ class Board:
         yc = ypos // CLENGTH
 
         # if the click is outside the board, reset the pieces
-        if not (0 <= xc <= 7 and 0 <= yc <= 7):  # de morgans law moment
+        if not (0 <= xc <= 7 and 0 <= yc <= 7 + self.promote):  # de morgans law moment
             self.reset_source()
             return
+
+        x, y = self.source_coord
+        if y % 7 == 0 and self.pieces[y][x].piece_type == PieceType.PAWN:
+            self.highlight_cells(True)
+            print("time to promote")
 
         # if there isn't a source cell
         if self.source_coord == (-1, -1):
@@ -146,11 +158,16 @@ class Board:
             return
 
         # there is a source cell
-        if (xc, yc) in self.highlighted_cells:
+        if not self.promote and (xc, yc) in self.highlighted_cells:
             self.move_piece(xc, yc, True)
-        self.reset_source()
+
+        if not self.promote:
+            self.reset_source()
 
     def highlight_cells(self, recur=False):
+        if self.promote:
+            self.highlighted_cells = set([(i, 8) for i in range(4)])
+            return
         self.highlighted_cells = set([])
         x, y = self.source_coord  # really do be wishing python 3.10 were here
         if self.pieces[y][x].piece_type == PieceType.PAWN:
@@ -175,7 +192,6 @@ class Board:
                 else:
                     temp.append(None)
             moved.append(temp)
-
 
         if recur:
             new_moves = set([])
@@ -244,22 +260,14 @@ class Board:
             dx += d2x
 
     def highlight_knight(self):
-        # 2 right 1 up
-        self.check_knight(2, -1)
-        # 2 right 1 down
-        self.check_knight(2, 1)
-        # 1 right 2 up
-        self.check_knight(1, -2)
-        # 1 right 2 down
-        self.check_knight(1, 2)
-        # 2 left 1 up
-        self.check_knight(-2, -1)
-        # 2 left 1 down
-        self.check_knight(-2, 1)
-        # 1 left 2 up
-        self.check_knight(-1, -2)
-        # 1 left 2 down
-        self.check_knight(-1, 2)
+        self.check_knight(2, -1)  # 2 right 1 up
+        self.check_knight(2, 1)  # 2 right 1 down
+        self.check_knight(1, -2)  # 1 right 2 up
+        self.check_knight(1, 2)  # 1 right 2 down
+        self.check_knight(-2, -1)  # 2 left 1 up
+        self.check_knight(-2, 1)  # 2 left 1 down
+        self.check_knight(-1, -2)  # 1 left 2 up
+        self.check_knight(-1, 2)  # 1 left 2 down
 
     def check_knight(self, dx, dy):
         x, y = self.source_coord
@@ -318,8 +326,6 @@ class Board:
             self.highlighted_cells.add((x - 2, y))
             self.highlighted_cells.add((x - 3, y))
 
-
-
     def check_king(self, dx, dy):
         x, y = self.source_coord
         if not (0 <= y + dy <= 7 and 0 <= x + dx <= 7):
@@ -335,27 +341,39 @@ class Board:
         self.highlighted_cells = set([])
 
     def move_piece(self, x, y, first=False):
+
         px, py = self.source_coord
-        if self.pieces[py][px].piece_type == PieceType.KING:
-            if abs((d := x - px)) == 2:
-                d //= 2
-                rookx = max([0, d] * 7)
-                self.pieces[y][px+d] = self.pieces[y][rookx]
-                self.pieces[y][px+d].moved = True
-                self.pieces[y][rookx] = Empty()
 
-            if px - x == 3:
-                self.pieces[y][2] = self.pieces[y][0]
-                self.pieces[y][2].moved = True
-                self.pieces[y][0] = Empty()
+        if self.pieces[py][px].piece_type == PieceType.PAWN and y % 7 == 0:
+            # wait for input from user asking which piece to turn into
+            self.pieces[y][x] = self.pieces[py][px]
+            self.pieces[py][px] = Empty()
+            self.source_coord = (x, y)
+            self.promote = True
+            self.highlight_cells(True)
+            return
+            # get input
+            # turn the piece into whatever type it should be
+        else:
+            # castling
+            if self.pieces[py][px].piece_type == PieceType.KING:
+                if abs((d := x - px)) == 2:
+                    d //= 2
+                    rookx = max([0, d] * 7)
+                    self.pieces[y][px+d] = self.pieces[y][rookx]
+                    self.pieces[y][px+d].moved = True
+                    self.pieces[y][rookx] = Empty()
 
+                if px - x == 3:
+                    self.pieces[y][2] = self.pieces[y][0]
+                    self.pieces[y][2].moved = True
+                    self.pieces[y][0] = Empty()
 
-        self.pieces[y][x] = self.pieces[self.source_coord[1]][self.source_coord[0]]
-        self.pieces[y][x].moved = True
-        self.pieces[self.source_coord[1]][self.source_coord[0]] = Empty()  # set the source piece to 0
+            self.pieces[y][x] = self.pieces[py][px]
+            self.pieces[y][x].moved = True
+            self.pieces[py][px] = Empty()  # set the source piece to 0
 
         current = self.source_coord
-
         self.check = self.is_check()
         self.source_coord = current
 
@@ -401,7 +419,7 @@ class Board:
                 self.highlight_cells()
                 for coord in self.highlighted_cells:
                     x, y = coord
-                    if self.pieces[y][x].piece_type == PieceType.KING and self.pieces[y][x].color.value != self.turn:
+                    if not self.promote and self.pieces[y][x].piece_type == PieceType.KING and self.pieces[y][x].color.value != self.turn:
                         return True
         return False
 

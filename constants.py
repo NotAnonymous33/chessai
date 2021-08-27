@@ -12,5 +12,5 @@ NUM_ROWS = 8
 FPS = 60
 _PNAMES = ["bB", "bK", "bN", "bp", "bQ", "bR", "wB", "wK", "wN", "wp", "wQ", "wR"]
 IMAGES = {i: pygame.transform.scale(pygame.image.load("images/" + i + ".png"), (CLENGTH, CLENGTH)) for i in _PNAMES}
-WIN = pygame.display.set_mode((TLENGTH, TLENGTH + 50))
+WIN = pygame.display.set_mode((TLENGTH, TLENGTH + CLENGTH))
 
