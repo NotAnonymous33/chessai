@@ -107,6 +107,7 @@ class Board:
         self.promote = False
 
     def draw(self):
+        WIN.fill((0, 0, 0))
         # draw the squares of the board
         for row in self.cells:
             for cell in row:
@@ -149,11 +150,9 @@ class Board:
         x, y = self.source_coord
         if y % 7 == 0 and self.pieces[y][x].piece_type == PieceType.PAWN:
             self.highlight_cells(True)
-            print("promoting")
             self.move_piece(xc, yc, True)
             self.reset_source()
             return
-
 
         # if there isn't a source cell
         if self.source_coord == (-1, -1):
@@ -247,14 +246,10 @@ class Board:
                 self.highlighted_cells.add((x + 1, y - self.turn))
 
     def highlight_bishop(self):
-        # top right
-        self.check_bishop(1, -1)
-        # top left
-        self.check_bishop(-1, -1)
-        # bottom right
-        self.check_bishop(1, 1)
-        # bottom left
-        self.check_bishop(-1, 1)
+        self.check_bishop(1, -1)  # top right
+        self.check_bishop(-1, -1)  # top left
+        self.check_bishop(1, 1)  # bottom right
+        self.check_bishop(-1, 1)  # bottom left
 
     def check_bishop(self, d2x, d2y):
         x, y = self.source_coord
@@ -360,6 +355,7 @@ class Board:
             self.pieces[py][px] = Piece(x, 7 * self.turn)
             self.pieces[py][px].moved = False
             self.promote = False
+            print("false")
         elif self.pieces[py][px].piece_type == PieceType.PAWN and y % 7 == 0:
             # wait for input from user asking which piece to turn into
             self.pieces[y][x] = self.pieces[py][px]

@@ -24,8 +24,6 @@ def main():
                 pos = pygame.mouse.get_pos()
                 board.click(pos[0], pos[1])
 
-
-
         board.draw()
         pygame.display.flip()
         clock.tick(FPS)
