@@ -2,14 +2,15 @@ from copy import copy
 from constants import *
 from pieces import Empty
 import functools
-import time
 from random import choice
+from timer import timer
 
 
 class AI:
     def __init__(self, depth=1):
         self.depth = depth - 1
 
+    @timer
     def move(self, board):
         # find the best move and move it
 
@@ -98,7 +99,7 @@ class AI:
                 (best_dest_coord[0] + best_source_coord[0]) // 2] = Empty()
         """
 
-    @functools.lru_cache(maxsize=None)
+    #@functools.lru_cache(maxsize=None)
     def minimax(self, board, depth, white) -> int:
         '''
         white value = 1

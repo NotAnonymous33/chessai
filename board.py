@@ -29,7 +29,7 @@ class Board:
         self.check = False
         self.quit = False
         self.promote = False
-        self.ai = AI(2)
+        self.ai = AI(3)
 
     def draw(self):
         WIN.fill((0, 0, 0))
@@ -235,6 +235,7 @@ class Board:
         if self.check:  # no castling allowed if in check
             return
         if self.pieces[y][x].moved: return  # no castling allowed if king has moved
+        if isinstance(self.pieces[y][7], Empty): return
 
         if not self.pieces[y][7].moved and (self.pieces[y][x+1].color.value == self.pieces[y][x+2].color.value == 0):
             self.highlighted_cells.add((x + 2, y))
