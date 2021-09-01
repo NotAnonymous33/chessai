@@ -3,6 +3,7 @@ from constants import *
 from pieces import Empty
 import functools
 import time
+from random import choice
 
 
 class AI:
@@ -46,11 +47,17 @@ class AI:
                 for move in board.highlighted_cells:
                     temp_board = board.copyboard()
                     temp_board.move_piece(*move)
-                    evaluation = temp_board.evaluate()
+
+                    if self.depth == 0:
+                        evaluation = temp_board.evaluate()
+                    else:
+                        evaluation = self.minimax(temp_board, self.depth, True)
+
                     if evaluation < lowest_eval:
                         lowest_eval = evaluation
                         best_source = (col, row)
                         best_move = move
+
         # dear future me, instead of making board, try doing board = temp_board in above for loop
         board.source_coord = best_source
         board.move_piece(*best_move)
@@ -110,6 +117,47 @@ class AI:
             else return lowest
 
         '''
+        # do stuff
+        val = 1 if white else -1
+        if depth == 1:
+            evals = []
+            for rowy in range(NUM_ROWS):
+                for colx in range(NUM_ROWS):
+                    if board.pieces[rowy][colx].color.value == val:
+                        board.reset_source()
+                        board.source_coord = (colx, rowy)
+                        board.highlight_cells(True)
+
+                        for move in board.highlighted_cells:
+                            temp_board = board.copyboard()
+                            temp_board.move_piece(*move)
+                            evals.append(temp_board.evaluate())
+            if not len(evals):
+                return 0
+            if white:
+                return max(evals)
+            return min(evals)
+
+        # depth is not 1
+        evals = []
+        for rowy in range(NUM_ROWS):
+            for colx in range(NUM_ROWS):
+                if board.pieces[rowy][colx].color.value == val:
+                    board.reset_source()
+                    board.source_coord = (colx, rowy)
+                    board.highlight_cells(True)
+
+                    for move in board.highlighted_cells:
+                        temp_board = board.copyboard()
+                        temp_board.move_piece(*move)
+                        evals.append(self.minimax(temp_board, depth - 1, not white))
+        if not len(evals):
+            return 0
+        if white:
+            return max(evals)
+        return min(evals)
+
+        """
         val = 1 if white else 0
         if depth == 1:
             evals = []
@@ -156,7 +204,7 @@ class AI:
         if white:
             return max(evals)
         return min(evals)
-
+        """
 
 
 

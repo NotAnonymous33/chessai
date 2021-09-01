@@ -29,7 +29,7 @@ class Board:
         self.check = False
         self.quit = False
         self.promote = False
-        self.ai = AI()
+        self.ai = AI(2)
 
     def draw(self):
         WIN.fill((0, 0, 0))
@@ -121,16 +121,6 @@ class Board:
         elif self.pieces[y][x].piece_type == PieceType.KING:
             self.highlight_king()
 
-        moved = []
-        for row in self.pieces:
-            temp = []
-            for piece in row:
-                if not isinstance(piece, Empty):
-                    temp.append(piece.moved)
-                else:
-                    temp.append(None)
-            moved.append(temp)
-
         if recur:
             new_moves = set([])
             for move in self.highlighted_cells:
@@ -142,10 +132,6 @@ class Board:
 
         self.highlighted_cells.discard((x, y))
 
-        for row_num in range(NUM_ROWS):
-            for col_num in range(NUM_ROWS):
-                if self.pieces[row_num][col_num] != Empty():
-                    self.pieces[row_num][col_num].moved = moved[row_num][col_num]
 
     def highlight_pawn(self):
         x, y = self.source_coord
@@ -384,8 +370,8 @@ class Board:
         return e
 
     def copyboard(self):
-        pass
         new_board = copy(self)
-        new_board.pieces = [copy(row) for row in self.pieces]
+        new_board.pieces = [[piece.copyp() for piece in row] for row in self.pieces]
         new_board.highlighted_cells = deepcopy(self.highlighted_cells)
+        # add copy stuff
         return new_board

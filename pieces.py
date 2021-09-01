@@ -52,6 +52,14 @@ class Piece:
     def __repr__(self):
         return f"{self.color} {self.piece_type}, {self.moved=}"
 
+    def copyp(self):
+        new = Piece(0, 0)
+        new.color = self.color
+        new.piece_type = self.piece_type
+        new.moved = self.moved
+        return new
+
+
 
 class Cell:
     def __init__(self, x, y):
@@ -76,4 +84,8 @@ class Empty:
 
     def draw(self, *args, **kwargs):
         pass
+
+    def copyp(self):
+        new = Empty()
+        return new
 
