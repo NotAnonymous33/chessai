@@ -1,13 +1,11 @@
-# import pygame
-from constants import *
 from copy import copy, deepcopy
 from pieces import *
 from ai import AI
 
 pygame.init()
 
-pieces_order = [PieceType.ROOK, PieceType.KNIGHT, PieceType.BISHOP, PieceType.QUEEN,
-                PieceType.KING, PieceType.BISHOP, PieceType.KNIGHT, PieceType.ROOK]
+pieces_order = [PieceType.Rook, PieceType.Knight, PieceType.Bishop, PieceType.Queen,
+                PieceType.King, PieceType.Bishop, PieceType.Knight, PieceType.Rook]
 pieces_order_char = ["R", "N", "B", "Q", "K", "B", "N", "R"]
 
 class Board:
@@ -16,10 +14,10 @@ class Board:
         self.pieces = [
             [Piece(i, 0) for i in range(NUM_ROWS)],
             [Piece(i, 1) for i in range(NUM_ROWS)],
-            [Empty() for _ in range(NUM_ROWS)],
-            [Empty() for _ in range(NUM_ROWS)],
-            [Empty() for _ in range(NUM_ROWS)],
-            [Empty() for _ in range(NUM_ROWS)],
+            [Piece() for _ in range(NUM_ROWS)],
+            [Piece() for _ in range(NUM_ROWS)],
+            [Piece() for _ in range(NUM_ROWS)],
+            [Piece() for _ in range(NUM_ROWS)],
             [Piece(i, 6) for i in range(NUM_ROWS)],
             [Piece(i, 7) for i in range(NUM_ROWS)]
         ]
@@ -29,7 +27,7 @@ class Board:
         self.check = False
         self.quit = False
         self.promote = False
-        self.ai = AI(3)
+        self.ai = AI(DEPTH)
 
     def draw(self):
         WIN.fill((0, 0, 0))
@@ -46,7 +44,8 @@ class Board:
         # draw highlighted squares
         for coord in self.highlighted_cells:
             color = HLCOLOR
-            if (coord[0] + coord[1]) % 2: color = HDCOLOR
+            if (coord[0] + coord[1]) % 2:
+                color = HDCOLOR
             pygame.draw.rect(WIN, color, [coord[0] * CLENGTH, coord[1] * CLENGTH, CLENGTH, CLENGTH])
 
         # draw selected square
@@ -73,7 +72,7 @@ class Board:
             return
 
         x, y = self.source_coord
-        if y % 7 == 0 and self.pieces[y][x].piece_type == PieceType.PAWN:
+        if y % 7 == 0 and self.pieces[y][x].piece_type == PieceType.Pawn:
             self.highlight_cells(True)
             self.move_piece(xc, yc, True)
             self.ai.move(self)
@@ -108,17 +107,17 @@ class Board:
             return
         self.highlighted_cells = set([])
         x, y = self.source_coord  # really do be wishing python 3.10 were here
-        if self.pieces[y][x].piece_type == PieceType.PAWN:
+        if self.pieces[y][x].piece_type == PieceType.Pawn:
             self.highlight_pawn()
-        elif self.pieces[y][x].piece_type == PieceType.BISHOP:
+        elif self.pieces[y][x].piece_type == PieceType.Bishop:
             self.highlight_bishop()
-        elif self.pieces[y][x].piece_type == PieceType.KNIGHT:
+        elif self.pieces[y][x].piece_type == PieceType.Knight:
             self.highlight_knight()
-        elif self.pieces[y][x].piece_type == PieceType.ROOK:
+        elif self.pieces[y][x].piece_type == PieceType.Rook:
             self.highlight_rook()
-        elif self.pieces[y][x].piece_type == PieceType.QUEEN:
+        elif self.pieces[y][x].piece_type == PieceType.Queen:
             self.highlight_queen()
-        elif self.pieces[y][x].piece_type == PieceType.KING:
+        elif self.pieces[y][x].piece_type == PieceType.King:
             self.highlight_king()
 
         if recur:
@@ -235,7 +234,7 @@ class Board:
         if self.check:  # no castling allowed if in check
             return
         if self.pieces[y][x].moved: return  # no castling allowed if king has moved
-        if isinstance(self.pieces[y][7], Empty): return
+        if not self.pieces[y][7].color.value: return
 
         if not self.pieces[y][7].moved and (self.pieces[y][x+1].color.value == self.pieces[y][x+2].color.value == 0):
             self.highlighted_cells.add((x + 2, y))
@@ -267,10 +266,10 @@ class Board:
             self.pieces[py][px].moved = False
             self.promote = False
             print("false")
-        elif self.pieces[py][px].piece_type == PieceType.PAWN and y % 7 == 0:
+        elif self.pieces[py][px].piece_type == PieceType.Pawn and y % 7 == 0:
             # wait for input from user asking which piece to turn into
             self.pieces[y][x] = self.pieces[py][px]
-            self.pieces[py][px] = Empty()
+            self.pieces[py][px] = Piece()
             self.source_coord = (x, y)
             self.promote = True
             self.highlight_cells(True)
@@ -279,22 +278,22 @@ class Board:
             # turn the piece into whatever type it should be
         else:
             # castling
-            if self.pieces[py][px].piece_type == PieceType.KING:
+            if self.pieces[py][px].piece_type == PieceType.King:
                 if abs((d := x - px)) == 2:
                     d //= 2
                     rookx = max([0, d] * 7)
                     self.pieces[y][px+d] = self.pieces[y][rookx]
                     self.pieces[y][px+d].moved = True
-                    self.pieces[y][rookx] = Empty()
+                    self.pieces[y][rookx] = Piece()
 
                 if px - x == 3:
                     self.pieces[y][2] = self.pieces[y][0]
                     self.pieces[y][2].moved = True
-                    self.pieces[y][0] = Empty()
+                    self.pieces[y][0] = Piece()
 
             self.pieces[y][x] = self.pieces[py][px]
             self.pieces[y][x].moved = True
-            self.pieces[py][px] = Empty()  # set the source piece to 0
+            self.pieces[py][px] = Piece()  # set the source piece to 0
 
         current = self.source_coord
         self.check = self.is_check()
@@ -340,7 +339,7 @@ class Board:
                 self.highlight_cells()
                 for coord in self.highlighted_cells:
                     x, y = coord
-                    if not self.promote and self.pieces[y][x].piece_type == PieceType.KING and self.pieces[y][x].color.value != self.turn:
+                    if not self.promote and self.pieces[y][x].piece_type == PieceType.King and self.pieces[y][x].color.value != self.turn:
                         return True
         return False
 
@@ -355,7 +354,7 @@ class Board:
                 self.highlight_cells()
                 for coord in self.highlighted_cells:
                     x, y = coord
-                    if self.pieces[y][x].piece_type == PieceType.KING and self.pieces[y][x].color.value != self.turn:
+                    if self.pieces[y][x].piece_type == PieceType.King and self.pieces[y][x].color.value != self.turn:
                         self.turn *= -1
                         return True
         self.turn *= -1

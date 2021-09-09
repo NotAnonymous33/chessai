@@ -2,34 +2,39 @@ from constants import *
 from aenum import Enum, NoAlias
 
 class PieceColor(Enum):
-    BLACK = -1
-    WHITE = 1
-    EMPTY = 0
+    Black = -1
+    White = 1
+    Empty = 0
 
 
 class PieceType(Enum):
     _settings_ = NoAlias
-    EMPTY = 0
-    PAWN = 1
-    ROOK = 5
-    BISHOP = 3
-    KNIGHT = 3
-    QUEEN = 9
-    KING = 999999
+    Empty = 0
+    Pawn = 1
+    Rook = 5
+    Bishop = 3
+    Knight = 3
+    Queen = 9
+    King = 999999
 
-pieces_order = [PieceType.ROOK, PieceType.KNIGHT, PieceType.BISHOP, PieceType.QUEEN,
-                PieceType.KING, PieceType.BISHOP, PieceType.KNIGHT, PieceType.ROOK]
+pieces_order = [PieceType.Rook, PieceType.Knight, PieceType.Bishop, PieceType.Queen,
+                PieceType.King, PieceType.Bishop, PieceType.Knight, PieceType.Rook]
 pieces_order_char = ["R", "N", "B", "Q", "K", "B", "N", "R"]
 
 
 class Piece:
-    def __init__(self, x, y):
+    def __init__(self, x=-1, y=-1):
         # sorting out color of piece
+        if x == -1:
+            self.moved = False
+            self.color = PieceColor.Empty
+            self.piece_type = PieceType.Empty
+            return
         if y < 3:
-            self.color = PieceColor.BLACK
+            self.color = PieceColor.Black
             img = "b"
         else:
-            self.color = PieceColor.WHITE
+            self.color = PieceColor.White
             img = "w"
 
         # type of piece
@@ -37,7 +42,7 @@ class Piece:
             self.piece_type = pieces_order[x]
             img += pieces_order_char[x]
         else:
-            self.piece_type = PieceType.PAWN
+            self.piece_type = PieceType.Pawn
             img += "p"
 
         # image of piece
@@ -47,12 +52,16 @@ class Piece:
         self.moved = False
 
     def draw(self, x, y):
+        if not self.color.value: return
         WIN.blit(self.image, (x * CLENGTH, y * CLENGTH))
 
     def __repr__(self):
         return f"{self.color} {self.piece_type}, {self.moved=}"
 
     def copyp(self):
+        if not self.color.value:
+            piece = Piece()
+            return piece
         new = Piece(0, 0)
         new.color = self.color
         new.piece_type = self.piece_type
@@ -73,11 +82,11 @@ class Cell:
     def __repr__(self):
         return f"({self.xcoor}, {self.ycoor})"
 
-
+"""
 class Empty:
     def __init__(self):
-        self.color = PieceColor.EMPTY
-        self.piece_type = PieceType.EMPTY
+        self.color = PieceColor.Empty
+        self.piece_type = PieceType.Empty
 
     def __repr__(self):
         return "empty"
@@ -89,3 +98,4 @@ class Empty:
         new = Empty()
         return new
 
+"""
