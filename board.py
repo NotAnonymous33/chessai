@@ -281,7 +281,7 @@ class Board:
             if self.pieces[py][px].piece_type == PieceType.King:
                 if abs((d := x - px)) == 2:
                     d //= 2
-                    rookx = max([0, d] * 7)
+                    rookx = max([0, d]) * 7
                     self.pieces[y][px+d] = self.pieces[y][rookx]
                     self.pieces[y][px+d].moved = True
                     self.pieces[y][rookx] = Piece()
