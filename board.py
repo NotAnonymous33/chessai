@@ -1,6 +1,7 @@
 from copy import copy, deepcopy
 from pieces import *
 from ai import AI
+import functools
 
 pygame.init()
 
@@ -100,6 +101,7 @@ class Board:
 
         if not self.promote:
             self.reset_source()
+
 
     def highlight_cells(self, recur=False):
         if self.promote:

@@ -2,6 +2,7 @@ from copy import copy
 from constants import *
 from random import choice
 from timer import timer
+import concurrent.futures
 
 
 class AI:
@@ -32,6 +33,7 @@ class AI:
         If evaluated position is higher than current evaluation, set best coords
         Move the piece
         """
+        self.board = board
         best_source = (0, 0)
         lowest_eval = 50
         best_move = None
@@ -43,26 +45,37 @@ class AI:
                 board.source_coord = (col, row)
                 board.highlight_cells(True)
 
+                # with concurrent.futures.ProcessPoolExecutor() as exe:
+                #     results = exe.map(self.get_eval, board.highlighted_cells)
+
                 for move in board.highlighted_cells:
                     temp_board = board.copyboard()
                     temp_board.move_piece(*move)
-
                     # add for if pawn y = 0
                     # add castling
+                    evaluation = self.minimax(temp_board, self.depth, True)
 
-                    if self.depth == 0:
-                        evaluation = temp_board.evaluate()
-                    else:
-                        evaluation = self.minimax(temp_board, self.depth, True)
+                    # x = 0
+                    # for result in results:
+                    #     if result < lowest_eval:
+                    #         lowest_eval = result
+                    #         best_source = (col, row)
+                    #         best_move = board.highlighted_cells[x]
+                    #     x += 1
+
 
                     if evaluation < lowest_eval:
                         lowest_eval = evaluation
                         best_source = (col, row)
                         best_move = move
 
-        # dear future me, instead of making board, try doing board = temp_board in above for loop
         board.source_coord = best_source
         board.move_piece(*best_move)
+
+    def get_eval(self, move):
+        temp_board = self.board.copyboard()
+        temp_board.move_piece(*move)
+        return self.minimax(temp_board, self.depth, True)
 
     def minimax(self, board, depth, white) -> int:
         '''
@@ -82,6 +95,8 @@ class AI:
             else return lowest
 
         '''
+        if depth == 0:
+            return board.evaluate()
         # do stuff
         val = 1 if white else -1
         if depth == 1:
