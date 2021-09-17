@@ -3,6 +3,7 @@ from pieces import *
 from ai import AI
 import functools
 
+
 pygame.init()
 
 pieces_order = [PieceType.Rook, PieceType.Knight, PieceType.Bishop, PieceType.Queen,
@@ -11,7 +12,6 @@ pieces_order_char = ["R", "N", "B", "Q", "K", "B", "N", "R"]
 
 class Board:
     def __init__(self):
-        self.cells = [[Cell(col, row) for col in range(NUM_ROWS)] for row in range(NUM_ROWS)]
         self.pieces = [
             [Piece(i, 0) for i in range(NUM_ROWS)],
             [Piece(i, 1) for i in range(NUM_ROWS)],
@@ -29,39 +29,6 @@ class Board:
         self.quit = False
         self.promote = False
         self.ai = AI(DEPTH)
-
-    def draw(self):
-        WIN.fill((0, 0, 0))
-        # draw the squares of the board
-        for row in self.cells:
-            for cell in row:
-                cell.draw()
-
-        if self.promote:
-            for i in range(4):
-                cell = Cell(i, 8)
-                cell.draw()
-
-        # draw highlighted squares
-        for coord in self.highlighted_cells:
-            color = HLCOLOR
-            if (coord[0] + coord[1]) % 2:
-                color = HDCOLOR
-            pygame.draw.rect(WIN, color, [coord[0] * CLENGTH, coord[1] * CLENGTH, CLENGTH, CLENGTH])
-
-        # draw selected square
-        pygame.draw.rect(WIN, SCOLOR,
-                         [self.source_coord[0] * CLENGTH, self.source_coord[1] * CLENGTH, CLENGTH, CLENGTH])
-
-        # draw pieces
-        for row_num in range(NUM_ROWS):
-            for col_num in range(NUM_ROWS):
-                self.pieces[row_num][col_num].draw(col_num, row_num)
-
-        if self.promote:
-            for i in range(4):
-                piece = Piece(i, 8)
-                piece.draw(i, 8)
 
     def click(self, xpos, ypos):
         xc = xpos // CLENGTH
@@ -372,8 +339,8 @@ class Board:
         return e
 
     def copyboard(self):
-        new_board = copy(self)
-        new_board.pieces = [[piece.copyp() for piece in row] for row in self.pieces]
-        new_board.highlighted_cells = deepcopy(self.highlighted_cells)
+        new_board = deepcopy(self)
+        # new_board.pieces = [[piece.copyp() for piece in row] for row in self.pieces]
+        # new_board.highlighted_cells = deepcopy(self.highlighted_cells)
         # add copy stuff
         return new_board

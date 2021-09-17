@@ -1,5 +1,6 @@
 from board import Board
 from constants import *
+import drawer
 
 
 pygame.init()
@@ -24,7 +25,7 @@ def main():
                 pos = pygame.mouse.get_pos()
                 board.click(pos[0], pos[1])
 
-        board.draw()
+        drawer.draw(board)
         pygame.display.flip()
         clock.tick(FPS)
 

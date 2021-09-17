@@ -8,12 +8,12 @@ class PieceColor(Enum):
 
 
 class PieceType(Enum):
-    _settings_ = NoAlias
+    # _settings_ = NoAlias
     Empty = 0
     Pawn = 1
     Rook = 5
     Bishop = 3
-    Knight = 3
+    Knight = 4
     Queen = 9
     King = 999999
 
@@ -46,14 +46,10 @@ class Piece:
             img += "p"
 
         # image of piece
-        self.image = IMAGES[img]
+        self.image = img
         if y == 8:
-            self.image = NIMAGES[ba[x]]
+            self.image = ba[x]
         self.moved = False
-
-    def draw(self, x, y):
-        if not self.color.value: return
-        WIN.blit(self.image, (x * CLENGTH, y * CLENGTH))
 
     def __repr__(self):
         return f"{self.color} {self.piece_type}, {self.moved=}"
