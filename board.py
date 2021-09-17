@@ -70,6 +70,7 @@ class Board:
             self.reset_source()
 
 
+
     def highlight_cells(self, recur=False):
         if self.promote:
             self.highlighted_cells = set([(i, 8) for i in range(4)])

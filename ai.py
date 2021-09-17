@@ -2,6 +2,8 @@ from copy import deepcopy
 from constants import *
 from timer import timer
 import concurrent.futures
+import time
+from itertools import repeat  # https://stackoverflow.com/questions/6785226/pass-multiple-parameters-to-concurrent-futures-executor-map
 
 
 class AI:
@@ -32,7 +34,6 @@ class AI:
         If evaluated position is higher than current evaluation, set best coords
         Move the piece
         """
-        self.board = board
         best_source = (0, 0)
         lowest_eval = 50
         best_move = None
@@ -45,21 +46,23 @@ class AI:
                 board.highlight_cells(True)
 
                 highlighted = list(board.highlighted_cells)
+                if not len(highlighted): continue
 
                 print("pygame moment")
 
                 with concurrent.futures.ProcessPoolExecutor() as exe:
-                    results = exe.map(self.get_eval, highlighted)
-                    x = 0
-                    # print(list(results))
-                    for result in results:
-                        print(result)
-                        if result < lowest_eval:
-                            lowest_eval = result
-                            best_source = (col, row)
-                            best_move = highlighted[x]
-                        x += 1
+                    results = exe.map(self.get_eval, highlighted, repeat(board))
 
+                x = 0
+                # print(list(results))
+                for result in results:
+                    print(result)
+                    if result < lowest_eval:
+                        lowest_eval = result
+                        best_source = (col, row)
+                        best_move = highlighted[x]
+                    x += 1
+                # pass
                 # for move in highlighted:
                 #     temp_board = deepcopy(board)
                 #     temp_board.move_piece(*move)
@@ -74,8 +77,8 @@ class AI:
         board.source_coord = best_source
         board.move_piece(*best_move)
 
-    def get_eval(self, move):
-        temp_board = deepcopy(self.board)
+    def get_eval(self, move, board):
+        temp_board = deepcopy(board)
         temp_board.move_piece(*move)
         return self.minimax(temp_board, self.depth, True)
 

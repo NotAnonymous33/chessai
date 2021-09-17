@@ -1,8 +1,8 @@
-import pygame
 from pieces import Cell, Piece
 from constants import *
 
 cells = [[Cell(col, row) for col in range(NUM_ROWS)] for row in range(NUM_ROWS)]
+
 
 def draw_piece(piece, x, y):
     if not piece.color.value: return
