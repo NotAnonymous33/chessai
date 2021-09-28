@@ -23,6 +23,7 @@ class Board:
             [Piece(i, 7) for i in range(NUM_ROWS)]
         ]
         self.source_coord = (-1, -1)
+        self.moved_to = (-1, -1)
         self.turn = 1
         self.highlighted_cells = set([])
         self.check = False
@@ -228,6 +229,7 @@ class Board:
         self.highlighted_cells = set([])
 
     def move_piece(self, x, y, first=False):
+        self.moved_to = (x, y)
 
         px, py = self.source_coord
 
@@ -299,6 +301,7 @@ class Board:
                 if self.highlighted_cells != set([]): return
         print("checkmate noob")
         self.quit = True
+        pygame.quit()
 
     def is_check(self):
         for row_num in range(NUM_ROWS):

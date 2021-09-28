@@ -50,29 +50,29 @@ class AI:
 
                 print("pygame moment")
 
-                with concurrent.futures.ProcessPoolExecutor() as exe:
-                    results = exe.map(self.get_eval, highlighted, repeat(board))
-
-                x = 0
-                # print(list(results))
-                for result in results:
-                    print(result)
-                    if result < lowest_eval:
-                        lowest_eval = result
-                        best_source = (col, row)
-                        best_move = highlighted[x]
-                    x += 1
-                # pass
-                # for move in highlighted:
-                #     temp_board = deepcopy(board)
-                #     temp_board.move_piece(*move)
-                #     # add for if pawn y = 0
-                #     # add castling
-                #     evaluation = self.minimax(temp_board, self.depth, True)
-                #     if evaluation < lowest_eval:
-                #         lowest_eval = evaluation
+                # with concurrent.futures.ProcessPoolExecutor() as exe:
+                #     results = exe.map(self.get_eval, highlighted, repeat(board))
+                #
+                # x = 0
+                # # print(list(results))
+                # for result in results:
+                #     print(result)
+                #     if result < lowest_eval:
+                #         lowest_eval = result
                 #         best_source = (col, row)
-                #         best_move = move
+                #         best_move = highlighted[x]
+                #     x += 1
+                # pass
+                for move in highlighted:
+                    temp_board = deepcopy(board)
+                    temp_board.move_piece(*move)
+                    # add for if pawn y = 0
+                    # add castling
+                    evaluation = self.minimax(temp_board, self.depth, True)
+                    if evaluation < lowest_eval:
+                        lowest_eval = evaluation
+                        best_source = (col, row)
+                        best_move = move
 
         board.source_coord = best_source
         board.move_piece(*best_move)

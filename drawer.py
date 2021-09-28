@@ -5,7 +5,8 @@ cells = [[Cell(col, row) for col in range(NUM_ROWS)] for row in range(NUM_ROWS)]
 
 
 def draw_piece(piece, x, y):
-    if not piece.color.value: return
+    if not piece.color.value:
+        return
     if y == 8:
         img = NIMAGES[piece.image]
     else:
@@ -52,6 +53,9 @@ def draw(board):
     pygame.draw.rect(WIN, SCOLOR,
                      [board.source_coord[0] * CLENGTH, board.source_coord[1] * CLENGTH, CLENGTH, CLENGTH])
 
+    pygame.draw.rect(WIN, (255, 0, 0),
+                     [board.moved_to[0] * CLENGTH, board.moved_to[1] * CLENGTH, CLENGTH, CLENGTH])
+
     # draw pieces
     draw_pieces(board)
 
@@ -59,4 +63,5 @@ def draw(board):
         for i in range(4):
             piece = Piece(i, 8)
             draw_piece(piece, i, 8)
+
 
