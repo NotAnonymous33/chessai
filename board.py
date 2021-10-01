@@ -3,12 +3,71 @@ from pieces import *
 from ai import AI
 import functools
 
-
 pygame.init()
 
 pieces_order = [PieceType.Rook, PieceType.Knight, PieceType.Bishop, PieceType.Queen,
                 PieceType.King, PieceType.Bishop, PieceType.Knight, PieceType.Rook]
 pieces_order_char = ["R", "N", "B", "Q", "K", "B", "N", "R"]
+
+pawn_table = [[0, 0, 0, 0, 0, 0, 0, 0],
+              [50, 50, 50, 50, 50, 50, 50, 50],
+              [10, 10, 20, 30, 30, 20, 10, 10],
+              [5, 5, 10, 25, 25, 10, 5, 5],
+              [0, 0, 0, 20, 20, 0, 0, 0],
+              [5, -5, -10, 0, 0, -10, -5, 5],
+              [5, 10, 10, -20, -20, 10, 10, 5],
+              [0, 0, 0, 0, 0, 0, 0, 0]]
+
+knight_table = [[-50, -40, -30, -30, -30, -30, -40, -50],
+                [-40, -20, 0, 0, 0, 0, -20, -40],
+                [-30, 0, 10, 15, 15, 10, 0, -30],
+                [-30, 5, 15, 20, 20, 15, 5, -30],
+                [-30, 0, 15, 20, 20, 15, 0, -30],
+                [-30, 5, 10, 15, 15, 10, 5, -30],
+                [-40, -20, 0, 5, 5, 0, -20, -40],
+                [-50, -40, -30, -30, -30, -30, -40, -50]]
+
+bishop_table = [[-20, -10, -10, -10, -10, -10, -10, -20],
+                [-10, 0, 0, 0, 0, 0, 0, -10],
+                [-10, 0, 5, 10, 10, 5, 0, -10],
+                [-10, 5, 5, 10, 10, 5, 5, -10],
+                [-10, 0, 10, 10, 10, 10, 0, -10],
+                [-10, 10, 10, 10, 10, 10, 10, -10],
+                [-10, 5, 0, 0, 0, 0, 5, -10],
+                [-20, -10, -10, -10, -10, -10, -10, -20, ]]
+
+rook_table = [[0, 0, 0, 0, 0, 0, 0, 0, ],
+              [5, 10, 10, 10, 10, 10, 10, 5],
+              [-5, 0, 0, 0, 0, 0, 0, -5],
+              [-5, 0, 0, 0, 0, 0, 0, -5],
+              [-5, 0, 0, 0, 0, 0, 0, -5],
+              [-5, 0, 0, 0, 0, 0, 0, -5],
+              [-5, 0, 0, 0, 0, 0, 0, -5],
+              [0, 0, 0, 5, 5, 0, 0, 0]]
+
+queen_table = [[-20, -10, -10, -5, -5, -10, -10, -20],
+               [-10, 0, 0, 0, 0, 0, 0, -10],
+               [-10, 0, 5, 5, 5, 5, 0, -10],
+               [-5, 0, 5, 5, 5, 5, 0, -5],
+               [0, 0, 5, 5, 5, 5, 0, -5],
+               [-10, 5, 5, 5, 5, 5, 0, -10],
+               [-10, 0, 5, 0, 0, 0, 0, -10],
+               [-20, -10, -10, -5, -5, -10, -10, -20]]
+
+empty_table = [[0 for i in range(8)] for j in range(8)]
+
+tables = {
+    PieceColor.White: {PieceType.Pawn: pawn_table, PieceType.Knight: knight_table, PieceType.Bishop: bishop_table,
+                       PieceType.Rook: rook_table, PieceType.Queen: queen_table, PieceType.Empty: empty_table,
+                       PieceType.King: empty_table},
+    PieceColor.Black: {PieceType.Pawn: pawn_table[::-1], PieceType.Knight: knight_table, PieceType.Bishop: bishop_table[::-1],
+                       PieceType.Rook: rook_table[::-1], PieceType.Queen: [row[::-1] for row in queen_table[::-1]], PieceType.Empty: empty_table,
+                       PieceType.King: empty_table},
+    PieceColor.Empty: {PieceType.Pawn: pawn_table, PieceType.Knight: knight_table, PieceType.Bishop: bishop_table,
+                       PieceType.Rook: rook_table, PieceType.Queen: queen_table, PieceType.Empty: empty_table,
+                       PieceType.King: empty_table}
+}
+
 
 class Board:
     def __init__(self):
@@ -70,8 +129,6 @@ class Board:
         if not self.promote:
             self.reset_source()
 
-
-
     def highlight_cells(self, recur=False):
         if self.promote:
             self.highlighted_cells = set([(i, 8) for i in range(4)])
@@ -101,7 +158,6 @@ class Board:
             self.highlighted_cells = new_moves
 
         self.highlighted_cells.discard((x, y))
-
 
     def highlight_pawn(self):
         x, y = self.source_coord
@@ -207,10 +263,13 @@ class Board:
         if self.pieces[y][x].moved: return  # no castling allowed if king has moved
         if not self.pieces[y][7].color.value: return
 
-        if not self.pieces[y][7].moved and (self.pieces[y][x+1].color.value == self.pieces[y][x+2].color.value == 0):
+        if not self.pieces[y][7].moved and (
+                self.pieces[y][x + 1].color.value == self.pieces[y][x + 2].color.value == 0):
             self.highlighted_cells.add((x + 2, y))
 
-        if not self.pieces[y][7].moved and (self.pieces[y][x-1].color.value == self.pieces[y][x-2].color.value == self.pieces[y][x-3].color.value == 0):
+        if not self.pieces[y][7].moved and (
+                self.pieces[y][x - 1].color.value == self.pieces[y][x - 2].color.value == self.pieces[y][
+            x - 3].color.value == 0):
             self.highlighted_cells.add((x - 2, y))
             self.highlighted_cells.add((x - 3, y))
 
@@ -254,8 +313,8 @@ class Board:
                 if abs((d := x - px)) == 2:
                     d //= 2
                     rookx = max([0, d]) * 7
-                    self.pieces[y][px+d] = self.pieces[y][rookx]
-                    self.pieces[y][px+d].moved = True
+                    self.pieces[y][px + d] = self.pieces[y][rookx]
+                    self.pieces[y][px + d].moved = True
                     self.pieces[y][rookx] = Piece()
 
                 if px - x == 3:
@@ -312,7 +371,8 @@ class Board:
                 self.highlight_cells()
                 for coord in self.highlighted_cells:
                     x, y = coord
-                    if not self.promote and self.pieces[y][x].piece_type == PieceType.King and self.pieces[y][x].color.value != self.turn:
+                    if not self.promote and self.pieces[y][x].piece_type == PieceType.King and self.pieces[y][
+                        x].color.value != self.turn:
                         return True
         return False
 
@@ -337,9 +397,12 @@ class Board:
         if self.quit:
             return self.turn * 99999999
         e = 0
-        for row in self.pieces:
-            e += sum(map(lambda x: x.color.value * x.piece_type.value, row))
-            # e += piece.color.value * piece.piece_type.value
+        for row in range(len(self.pieces)):
+            for col in range(len(self.pieces[row])):
+                piece = self.pieces[row][col]
+                weight = tables[piece.color][piece.piece_type][row][col]
+                e += piece.color.value * (piece.piece_type.value + weight)
+                # e += piece.color.value * piece.piece_type.value
         return e
 
     def copyboard(self):

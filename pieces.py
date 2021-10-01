@@ -10,12 +10,12 @@ class PieceColor(Enum):
 class PieceType(Enum):
     # _settings_ = NoAlias
     Empty = 0
-    Pawn = 1
-    Rook = 5
-    Bishop = 3
-    Knight = 4
-    Queen = 9
-    King = 999999
+    Pawn = 100
+    Rook = 500
+    Bishop = 330
+    Knight = 320
+    Queen = 900
+    King = 20000
 
 pieces_order = [PieceType.Rook, PieceType.Knight, PieceType.Bishop, PieceType.Queen,
                 PieceType.King, PieceType.Bishop, PieceType.Knight, PieceType.Rook]

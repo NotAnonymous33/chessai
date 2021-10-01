@@ -35,7 +35,7 @@ class AI:
         Move the piece
         """
         best_source = (0, 0)
-        lowest_eval = 50
+        lowest_eval = 99999999999
         best_move = None
         for row in range(NUM_ROWS):
             for col in range(NUM_ROWS):
