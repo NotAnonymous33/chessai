@@ -54,6 +54,7 @@ class Piece:
     def __repr__(self):
         return f"{self.color} {self.piece_type}, {self.moved=}"
 
+    """
     def copyp(self):
         if not self.color.value:
             piece = Piece()
@@ -63,6 +64,7 @@ class Piece:
         new.piece_type = self.piece_type
         new.moved = self.moved
         return new
+    """
 
 
 

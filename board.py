@@ -1,7 +1,8 @@
-from copy import copy, deepcopy
 from pieces import *
 from ai import AI
-import functools
+from functools import cache
+import pickle
+
 
 pygame.init()
 
@@ -104,6 +105,7 @@ class Board:
             self.highlight_cells(True)
             self.move_piece(xc, yc, True)
             self.ai.move(self)
+            # self.move_piece(*self.ai.move(self))
             self.reset_source()
             return
 
@@ -125,6 +127,7 @@ class Board:
         if not self.promote and (xc, yc) in self.highlighted_cells:
             self.move_piece(xc, yc, True)
             self.ai.move(self)
+            # self.move_piece(*self.ai.move(self))
 
         if not self.promote:
             self.reset_source()
@@ -393,6 +396,7 @@ class Board:
         self.turn *= -1
         return False
 
+    @cache
     def evaluate(self):
         if self.quit:
             return self.turn * 99999999
@@ -405,9 +409,20 @@ class Board:
                 # e += piece.color.value * piece.piece_type.value
         return e
 
+
+        # e = sum([sum([self.pieces[row][col].color.value * (self.pieces[row][col].piece_type.value + tables[self.pieces[row][col].color][self.pieces[row][col].piece_type][row][col]) for col in range(len(self.pieces[row]))]) for row in range(len(self.pieces))])
+        # return e
+
+        # for row in self.pieces:
+        #     e += sum(map(lambda x: x.color.value * x.piece_type.value, row))
+        #     # e += piece.color.value * piece.piece_type.value
+        # return e
+
     def copyboard(self):
-        new_board = deepcopy(self)
         # new_board.pieces = [[piece.copyp() for piece in row] for row in self.pieces]
-        # new_board.highlighted_cells = deepcopy(self.highlighted_cells)
         # add copy stuff
-        return new_board
+
+        return pickle.loads(pickle.dumps(self, -1))
+
+
+

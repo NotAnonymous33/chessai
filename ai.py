@@ -1,6 +1,8 @@
 from copy import deepcopy
 from constants import *
 from timer import timer
+from functools import cache
+from tqdm import trange
 import concurrent.futures
 import time
 from itertools import repeat  # https://stackoverflow.com/questions/6785226/pass-multiple-parameters-to-concurrent-futures-executor-map
@@ -39,6 +41,7 @@ class AI:
         best_move = None
         for row in range(NUM_ROWS):
             for col in range(NUM_ROWS):
+                print(row, col)
                 if board.pieces[row][col].color.value != -1:
                     continue
                 board.reset_source()
@@ -76,12 +79,15 @@ class AI:
 
         board.source_coord = best_source
         board.move_piece(*best_move)
+        # return best_move
 
+    # @cache
     def get_eval(self, move, board):
         temp_board = deepcopy(board)
         temp_board.move_piece(*move)
         return self.minimax(temp_board, self.depth, True)
 
+    # @cache
     def minimax(self, board, depth, white) -> int:
         '''
         white value = 1
@@ -125,6 +131,7 @@ class AI:
 
         # depth is not 1
         evals = []
+        low = 99999999
         for rowy in range(NUM_ROWS):
             for colx in range(NUM_ROWS):
                 if board.pieces[rowy][colx].color.value == val:
@@ -136,6 +143,14 @@ class AI:
                         temp_board = board.copyboard()
                         temp_board.move_piece(*move)
                         evals.append(self.minimax(temp_board, depth - 1, not white))
+                        # if white:
+                        #     if (current := temp_board.evaluate()) < low:
+                        #         low = current
+                        #         evals.append(self.minimax(temp_board, depth - 1, not white))
+                        # else:
+                        #     evals.append(self.minimax(temp_board, depth - 1, not white))
+                        # these people weren't lying
+                        # when they said that alpha-beta pruning reduces branching factor by square root
         if not len(evals):
             return 0
         if white:
