@@ -1,7 +1,7 @@
 import pygame
 
 
-DEPTH = 3 # speed = 0.02 * 24^(depth - 1)
+DEPTH = 4 # speed = 0.02 * 24^(depth - 1)
 LCOLOR = (240, 230, 220)
 RCOLOR = (199, 117, 61)
 SCOLOR = (0, 255, 255)

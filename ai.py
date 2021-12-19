@@ -123,8 +123,8 @@ class AI:
 
         if white:
             maxEval = -999999999
-            for rowy in range(NUM_ROWS):
-                for colx in range(NUM_ROWS):
+            for rowy in range(NUM_ROWS)[::-1]:
+                for colx in range(NUM_ROWS)[::-1]:
                     if board.pieces[rowy][colx].color.value == val:
                         board.reset_source()
                         board.source_coord = (colx, rowy)
@@ -142,8 +142,8 @@ class AI:
         # if not white
 
         minEval = 999999999
-        for rowy in range(NUM_ROWS):
-            for colx in range(NUM_ROWS):
+        for rowy in range(NUM_ROWS)[::-1]:
+            for colx in range(NUM_ROWS)[::-1]:
                 if board.pieces[rowy][colx].color.value == val:
                     board.reset_source()
                     board.source_coord = (colx, rowy)
