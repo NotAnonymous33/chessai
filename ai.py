@@ -98,7 +98,7 @@ class AI:
         return self.minimax(temp_board, self.depth, True)
 
     # @cache
-    def minimax(self, board, depth, white) -> int:
+    def minimax(self, board, depth, white, alpha=0, beta=0) -> int:
         '''
         white value = 1
         black value = 0
@@ -119,30 +119,9 @@ class AI:
         if depth == 0:
             return board.evaluate()
         # do stuff
-        val = 1 if white else -1
-        if depth == 1:
-            evals = []
-            for rowy in range(NUM_ROWS):
-                for colx in range(NUM_ROWS):
-                    if board.pieces[rowy][colx].color.value == val:
-                        board.reset_source()
-                        board.source_coord = (colx, rowy)
-                        board.highlight_cells(True)
+        val = [-1, 1][white]  # val = 1 if white else -1
 
-                        for move in board.highlighted_cells:
-                            temp_board = board.copyboard()
-                            temp_board.move_piece(*move)
-                            evals.append(temp_board.evaluate())
-            # print("final")
-            # print(evals)
-            # print()
-            if not len(evals):
-                return 999999 * val
-            if white:
-                return max(evals)
-            return min(evals)
-
-        # depth is not 1
+        # depth is not 0
         evals = []
         for rowy in range(NUM_ROWS):
             for colx in range(NUM_ROWS):
@@ -154,12 +133,7 @@ class AI:
                     for move in board.highlighted_cells:
                         temp_board = board.copyboard()
                         temp_board.move_piece(*move)
-                        # if abs((r := temp_board.evaluate())) == 99999999 * temp_board.turn:
-                        #    return r
                         evals.append(self.minimax(temp_board, depth - 1, not white))
-        # print(depth)
-        # print(evals)
-        # print()
         if not len(evals):
             return 0
         if white:
