@@ -1,6 +1,7 @@
+from copy import copy, deepcopy
 from pieces import *
 from ai import AI
-from functools import cache
+from functools import lru_cache
 import pickle
 
 
@@ -105,13 +106,12 @@ class Board:
             self.highlight_cells(True)
             self.move_piece(xc, yc, True)
             self.ai.move(self)
-            # self.move_piece(*self.ai.move(self))
             self.reset_source()
             return
 
         # if there isn't a source cell
         if self.source_coord == (-1, -1):
-            if self.pieces[yc][xc].color.value == self.turn:  # if a cell with a piece is clicked
+            if self.pieces[yc][xc].color.value is self.turn:  # if a cell with a piece is clicked
                 self.source_coord = (xc, yc)  # set the clicked piece as the source piece
                 self.highlight_cells(True)
                 '''
@@ -127,7 +127,6 @@ class Board:
         if not self.promote and (xc, yc) in self.highlighted_cells:
             self.move_piece(xc, yc, True)
             self.ai.move(self)
-            # self.move_piece(*self.ai.move(self))
 
         if not self.promote:
             self.reset_source()
@@ -138,17 +137,17 @@ class Board:
             return
         self.highlighted_cells = set([])
         x, y = self.source_coord  # really do be wishing python 3.10 were here
-        if self.pieces[y][x].piece_type == PieceType.Pawn:
+        if self.pieces[y][x].piece_type is PieceType.Pawn:
             self.highlight_pawn()
-        elif self.pieces[y][x].piece_type == PieceType.Bishop:
+        elif self.pieces[y][x].piece_type is PieceType.Bishop:
             self.highlight_bishop()
-        elif self.pieces[y][x].piece_type == PieceType.Knight:
+        elif self.pieces[y][x].piece_type is PieceType.Knight:
             self.highlight_knight()
-        elif self.pieces[y][x].piece_type == PieceType.Rook:
+        elif self.pieces[y][x].piece_type is PieceType.Rook:
             self.highlight_rook()
-        elif self.pieces[y][x].piece_type == PieceType.Queen:
+        elif self.pieces[y][x].piece_type is PieceType.Queen:
             self.highlight_queen()
-        elif self.pieces[y][x].piece_type == PieceType.King:
+        elif self.pieces[y][x].piece_type is PieceType.King:
             self.highlight_king()
 
         if recur:
@@ -195,10 +194,10 @@ class Board:
         dx, dy = d2x, d2y
         stop = False
         while 0 <= x + dx <= 7 and 0 <= y + dy <= 7 and not stop:
-            if self.pieces[y + dy][x + dx].color.value == self.turn * -1:
+            if self.pieces[y + dy][x + dx].color.value is self.turn * -1:
                 stop = True
                 self.highlighted_cells.add((x + dx, y + dy))
-            elif self.pieces[y + dy][x + dx].color.value == self.turn:
+            elif self.pieces[y + dy][x + dx].color.value is self.turn:
                 stop = True
             else:
                 self.highlighted_cells.add((x + dx, y + dy))
@@ -219,7 +218,7 @@ class Board:
         x, y = self.source_coord
         if not (0 <= x + dx <= 7): return
         if not (0 <= y + dy <= 7): return
-        if self.pieces[y + dy][x + dx].color.value != self.turn:  # 2 right 1 up
+        if self.pieces[y + dy][x + dx].color.value is not self.turn:  # 2 right 1 up
             self.highlighted_cells.add((x + dx, y + dy))
 
     def highlight_queen(self):
@@ -239,10 +238,10 @@ class Board:
         while True:
             if not (0 <= x + dx <= 7 and 0 <= y + dy <= 7):
                 return
-            if self.pieces[y + dy][x + dx].color.value == self.turn * -1:
+            if self.pieces[y + dy][x + dx].color.value is self.turn * -1:
                 self.highlighted_cells.add((x + dx, y + dy))
                 return
-            elif self.pieces[y + dy][x + dx].color.value == self.turn:
+            elif self.pieces[y + dy][x + dx].color.value is self.turn:
                 return
             else:
                 self.highlighted_cells.add((x + dx, y + dy))
@@ -280,7 +279,7 @@ class Board:
         x, y = self.source_coord
         if not (0 <= y + dy <= 7 and 0 <= x + dx <= 7):
             return
-        if self.pieces[y + dy][x + dx].color.value != self.turn:
+        if self.pieces[y + dy][x + dx].color.value is not self.turn:
             self.highlighted_cells.add((x + dx, y + dy))
 
     def check_quit(self):
@@ -357,7 +356,7 @@ class Board:
     def check_checkmate(self):
         for row_num in range(NUM_ROWS):
             for col_num in range(NUM_ROWS):
-                if self.pieces[row_num][col_num].color.value != self.turn: continue
+                if self.pieces[row_num][col_num].color.value is not self.turn: continue
                 self.source_coord = (col_num, row_num)
                 self.highlight_cells(True)
                 if self.highlighted_cells != set([]): return
@@ -368,14 +367,14 @@ class Board:
     def is_check(self):
         for row_num in range(NUM_ROWS):
             for col_num in range(NUM_ROWS):
-                if self.pieces[row_num][col_num].color.value != self.turn:
+                if self.pieces[row_num][col_num].color.value is not self.turn:
                     continue
                 self.source_coord = (col_num, row_num)
                 self.highlight_cells()
                 for coord in self.highlighted_cells:
                     x, y = coord
-                    if not self.promote and self.pieces[y][x].piece_type == PieceType.King and self.pieces[y][
-                        x].color.value != self.turn:
+                    if not self.promote and self.pieces[y][x].piece_type is PieceType.King and self.pieces[y][
+                        x].color.value is not self.turn:
                         return True
         return False
 
@@ -383,43 +382,38 @@ class Board:
         self.turn *= -1
         for row_num in range(NUM_ROWS):
             for col_num in range(NUM_ROWS):
-                if self.pieces[row_num][col_num].color.value != self.turn:
+                if self.pieces[row_num][col_num].color.value is not self.turn:
                     continue
                 self.reset_source()
                 self.source_coord = (col_num, row_num)
                 self.highlight_cells()
                 for coord in self.highlighted_cells:
                     x, y = coord
-                    if self.pieces[y][x].piece_type == PieceType.King and self.pieces[y][x].color.value != self.turn:
+                    if self.pieces[y][x].piece_type is PieceType.King and self.pieces[y][x].color.value is not self.turn:
                         self.turn *= -1
                         return True
         self.turn *= -1
         return False
 
-    @cache
+    #@lru_cache(maxsize=None)
     def evaluate(self):
         if self.quit:
+            print("quit")
             return self.turn * 99999999
+
+        # add enumerate here
         e = 0
-        for row in range(len(self.pieces)):
-            for col in range(len(self.pieces[row])):
-                piece = self.pieces[row][col]
-                weight = tables[piece.color][piece.piece_type][row][col]
+        for y, row in enumerate(self.pieces):
+            for x, piece in enumerate(row):
+                weight = tables[piece.color][piece.piece_type][y][x]
                 e += piece.color.value * (piece.piece_type.value + weight)
                 # e += piece.color.value * piece.piece_type.value
         return e
 
-
-        # e = sum([sum([self.pieces[row][col].color.value * (self.pieces[row][col].piece_type.value + tables[self.pieces[row][col].color][self.pieces[row][col].piece_type][row][col]) for col in range(len(self.pieces[row]))]) for row in range(len(self.pieces))])
-        # return e
-
-        # for row in self.pieces:
-        #     e += sum(map(lambda x: x.color.value * x.piece_type.value, row))
-        #     # e += piece.color.value * piece.piece_type.value
-        # return e
-
     def copyboard(self):
+        # new_board = deepcopy(self)
         # new_board.pieces = [[piece.copyp() for piece in row] for row in self.pieces]
+        # new_board.highlighted_cells = deepcopy(self.highlighted_cells)
         # add copy stuff
 
         return pickle.loads(pickle.dumps(self, -1))

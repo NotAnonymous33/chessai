@@ -1,5 +1,5 @@
 from constants import *
-from aenum import Enum, NoAlias
+from enum import Enum
 
 class PieceColor(Enum):
     Black = -1

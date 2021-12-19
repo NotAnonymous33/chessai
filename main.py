@@ -17,6 +17,7 @@ def main():
 
     # game loop
     while running:
+        # board.ai.move(board)
         for event in pygame.event.get():
             if event.type == pygame.QUIT or board.check_quit():
                 running = False
