@@ -98,7 +98,7 @@ class AI:
         return self.minimax(temp_board, self.depth, True)
 
     # @cache
-    def minimax(self, board, depth, white, alpha=0, beta=0) -> int:
+    def minimax(self, board, depth, white, alpha=-999999, beta=999999) -> int:
         '''
         white value = 1
         black value = 0
@@ -121,8 +121,27 @@ class AI:
         # do stuff
         val = [-1, 1][white]  # val = 1 if white else -1
 
-        # depth is not 0
-        evals = []
+        if white:
+            maxEval = -999999999
+            for rowy in range(NUM_ROWS):
+                for colx in range(NUM_ROWS):
+                    if board.pieces[rowy][colx].color.value == val:
+                        board.reset_source()
+                        board.source_coord = (colx, rowy)
+                        board.highlight_cells(True)
+
+                        for move in board.highlighted_cells:
+                            temp_board = board.copyboard()
+                            temp_board.move_piece(*move)
+                            eval = self.minimax(temp_board, depth - 1, not white, alpha, beta)
+                            maxEval = max(maxEval, eval)
+                            alpha = max(alpha, eval)
+                            if beta <= alpha:
+                                return maxEval
+            return maxEval
+        # if not white
+
+        minEval = 999999999
         for rowy in range(NUM_ROWS):
             for colx in range(NUM_ROWS):
                 if board.pieces[rowy][colx].color.value == val:
@@ -133,9 +152,31 @@ class AI:
                     for move in board.highlighted_cells:
                         temp_board = board.copyboard()
                         temp_board.move_piece(*move)
-                        evals.append(self.minimax(temp_board, depth - 1, not white))
-        if not len(evals):
-            return 0
-        if white:
-            return max(evals)
-        return min(evals)
+                        eval = self.minimax(temp_board, depth - 1, not white, alpha, beta)
+                        minEval = min(minEval, eval)
+                        beta = min(beta, eval)
+                        if beta <= alpha:
+                            return minEval
+        return minEval
+
+
+
+        # # https://www.youtube.com/watch?v=l-hh51ncgDI
+        # # depth is not 0
+        # evals = []
+        # for rowy in range(NUM_ROWS):
+        #     for colx in range(NUM_ROWS):
+        #         if board.pieces[rowy][colx].color.value == val:
+        #             board.reset_source()
+        #             board.source_coord = (colx, rowy)
+        #             board.highlight_cells(True)
+        #
+        #             for move in board.highlighted_cells:
+        #                 temp_board = board.copyboard()
+        #                 temp_board.move_piece(*move)
+        #                 evals.append(self.minimax(temp_board, depth - 1, not white))
+        # if not len(evals):
+        #     return 0
+        # if white:
+        #     return max(evals)
+        # return min(evals)
