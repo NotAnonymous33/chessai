@@ -1,9 +1,8 @@
-from copy import copy, deepcopy
 from pieces import *
 from ai import AI
 from functools import lru_cache
 import pickle
-from numba import jit
+
 
 
 pygame.init()
@@ -73,7 +72,7 @@ tables = {
 
 
 class Board:
-    def __init__(self):
+    def __init__(self, depth=3):
         self.pieces = [
             [Piece(i, 0) for i in range(NUM_ROWS)],
             [Piece(i, 1) for i in range(NUM_ROWS)],
@@ -91,7 +90,8 @@ class Board:
         self.check = False
         self.quit = False
         self.promote = False
-        self.ai = AI(DEPTH)
+        self.ai = AI(depth)
+
 
     def click(self, xpos, ypos):
         xc = xpos // CLENGTH

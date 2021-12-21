@@ -1,5 +1,5 @@
 import pygame
-
+pygame.init()
 
 DEPTH = 3 # speed = 0.02 * 24^(depth - 1)
 LCOLOR = (240, 230, 220)
