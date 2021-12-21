@@ -1,16 +1,17 @@
 import pygame
 
 
-DEPTH = 4 # speed = 0.02 * 24^(depth - 1)
+DEPTH = 3 # speed = 0.02 * 24^(depth - 1)
 LCOLOR = (240, 230, 220)
 RCOLOR = (199, 117, 61)
+MCOLOR = (220, 173, 140)
 SCOLOR = (0, 255, 255)
 HDCOLOR = (0, 181, 98)  # (127, 255, 0)
 HLCOLOR = (0, 255, 150)
 TLENGTH = 600
 CLENGTH = TLENGTH // 8
-BCOLOR = (123, 161, 167)
-BCOLOR2 = (103, 141, 147)
+BCOLOR2 = (217, 128, 255)
+BCOLOR = (179, 0, 255)
 NUM_ROWS = 8
 FPS = 60
 _PNAMES = ["bB", "bK", "bN", "bp", "bQ", "bR", "wB", "wK", "wN", "wp", "wQ", "wR"]

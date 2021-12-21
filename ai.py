@@ -2,6 +2,7 @@ from copy import deepcopy
 from constants import *
 from timer import timer
 from functools import lru_cache
+from numba import njit
 
 import concurrent.futures
 import time
@@ -92,12 +93,14 @@ class AI:
     #     a[temp_board] = self.minimax(temp_board, self.depth, True)
     #     return a[temp_board]
 
+
     def get_eval(self, move, board):
         temp_board = deepcopy(board)
         temp_board.move_piece(*move)
         return self.minimax(temp_board, self.depth, True)
 
     # @cache
+    # @lru_cache(maxsize=None)
     def minimax(self, board, depth, white, alpha=-999999, beta=999999) -> int:
         '''
         white value = 1

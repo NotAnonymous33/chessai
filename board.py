@@ -3,6 +3,7 @@ from pieces import *
 from ai import AI
 from functools import lru_cache
 import pickle
+from numba import jit
 
 
 pygame.init()
