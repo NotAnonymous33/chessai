@@ -1,8 +1,10 @@
-from copy import deepcopy
+# from copy import deepcopy
 from constants import *
 from timer import timer
 from functools import lru_cache
 from numba import njit
+import pickle
+
 
 import concurrent.futures
 import time
@@ -71,7 +73,8 @@ class AI:
                 # pass
 
                 for move in highlighted:
-                    temp_board = deepcopy(board)
+                    # temp_board = deepcopy(board)
+                    temp_board = pickle.loads(pickle.dumps(board, -1))
                     temp_board.move_piece(*move)
                     # add for if pawn y = 0
                     # add castling
@@ -83,21 +86,6 @@ class AI:
 
         board.source_coord = best_source
         board.move_piece(*best_move)
-
-    # @cache
-    # def get_eval(self, move, board, a={}):
-    #     temp_board = deepcopy(board)
-    #     temp_board.move_piece(*move)
-    #     if temp_board in a:
-    #         return a[temp_board]
-    #     a[temp_board] = self.minimax(temp_board, self.depth, True)
-    #     return a[temp_board]
-
-
-    def get_eval(self, move, board):
-        temp_board = deepcopy(board)
-        temp_board.move_piece(*move)
-        return self.minimax(temp_board, self.depth, True)
 
     # @cache
     # @lru_cache(maxsize=None)

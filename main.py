@@ -13,21 +13,22 @@ def main():
     title = pygame.font.SysFont("Comic Sans MS", 70)
     normal = pygame.font.SysFont("Comic Sans MS", 30)
 
-    board = Board()
-
+    board = None
     running = True
     option = 0
 
     buttons = []
-    buttons.append(Button(100, 200, 300, 50, 1, "New Game"))  # new game button
+    buttons.append(Button(100, 200, 300, 50, 1, "New Game vs AI"))  # new game button
     buttons.append(Button(100, 300, 300, 50, 3, "Continue Game"))  # continue game button
     buttons.append(Button(100, 400, 300, 50, 4, "Settings"))  # continue game button
+    buttons.append(Button(100, 500, 300, 50, 6, "New Game vs Player"))  # continue game button
+
+
     quit = Button(525, 600, 75, 75, 2, "Quit")  # quit button
-    x = 0
 
     settings = []
-    settings.append(Button(300, 200, 50, 50, 4, "-"))
-    settings.append(Button(400, 200, 50, 50, 5, "+"))
+    settings.append(Button(300, 200, 50, 50, 4, "-"))  # decrease depth
+    settings.append(Button(400, 200, 50, 50, 5, "+"))  # increase depth
     # settings.append(Button(100, 400, 300, 50, 4, "3"))
 
 
@@ -35,10 +36,10 @@ def main():
     # 0 ... Menu
     # 1 ... Game
     # 2 ... Quit
-    # 3 ... New game
+    # 3 ... New game vs AI
     # 4 ... -1 depth
     # 5 ... +1 depth
-    # 6 ...
+    # 6 ... New game vs player
 
     while running:
         # Menu
@@ -49,7 +50,7 @@ def main():
 
             for event in pygame.event.get():
                 pos = pygame.mouse.get_pos()
-                if event.type == pygame.QUIT or board.check_quit():
+                if event.type == pygame.QUIT:
                     running = False
                 elif event.type == pygame.MOUSEBUTTONUP:
                     vals = [button.click(*pos) for button in buttons]
@@ -62,11 +63,14 @@ def main():
             for button in buttons:
                 button.draw()
 
-        # Game
+        # continue Game
         elif option == 3:
+            if board is None:
+                option = 0
+                continue
             for event in pygame.event.get():
                 pos = pygame.mouse.get_pos()
-                if event.type == pygame.QUIT or board.check_quit():
+                if event.type == pygame.QUIT:
                     running = False
 
                 if event.type == pygame.MOUSEBUTTONUP:
@@ -80,9 +84,12 @@ def main():
             quit.draw()
 
         # New game
-        elif option == 1:
+        elif option == 1 or option == 6:
             print(DEPTH)
-            board = Board(DEPTH)
+            if option == 1:
+                board = Board(DEPTH)
+            else:
+                board = Board(0)
             option = 3
 
         # Settings
@@ -95,7 +102,7 @@ def main():
 
             for event in pygame.event.get():
                 pos = pygame.mouse.get_pos()
-                if event.type == pygame.QUIT or board.check_quit():
+                if event.type == pygame.QUIT:
                     running = False
                 elif event.type == pygame.MOUSEBUTTONUP:
                     if quit.click(*pos) == 2:
@@ -116,6 +123,7 @@ def main():
             for button in settings:
                 button.draw()
             quit.draw()
+
 
 
         pygame.display.flip()

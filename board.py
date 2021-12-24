@@ -90,7 +90,10 @@ class Board:
         self.check = False
         self.quit = False
         self.promote = False
-        self.ai = AI(depth)
+        if depth == 0:
+            self.ai = None
+        else:
+            self.ai = AI(depth)
 
 
     def click(self, xpos, ypos):
@@ -106,7 +109,8 @@ class Board:
         if y % 7 == 0 and self.pieces[y][x].piece_type == PieceType.Pawn:
             self.highlight_cells(True)
             self.move_piece(xc, yc, True)
-            self.ai.move(self)
+            if self.ai:
+                self.ai.move(self)
             self.reset_source()
             return
 
@@ -127,7 +131,8 @@ class Board:
         # there is a source cell
         if not self.promote and (xc, yc) in self.highlighted_cells:
             self.move_piece(xc, yc, True)
-            self.ai.move(self)
+            if self.ai:
+                self.ai.move(self)
 
         if not self.promote:
             self.reset_source()
