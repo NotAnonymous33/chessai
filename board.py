@@ -3,10 +3,6 @@ from ai import AI
 from functools import lru_cache
 import pickle
 
-
-
-pygame.init()
-
 pieces_order = [PieceType.Rook, PieceType.Knight, PieceType.Bishop, PieceType.Queen,
                 PieceType.King, PieceType.Bishop, PieceType.Knight, PieceType.Rook]
 pieces_order_char = ["R", "N", "B", "Q", "K", "B", "N", "R"]
@@ -62,27 +58,41 @@ tables = {
     PieceColor.White: {PieceType.Pawn: pawn_table, PieceType.Knight: knight_table, PieceType.Bishop: bishop_table,
                        PieceType.Rook: rook_table, PieceType.Queen: queen_table, PieceType.Empty: empty_table,
                        PieceType.King: empty_table},
-    PieceColor.Black: {PieceType.Pawn: pawn_table[::-1], PieceType.Knight: knight_table, PieceType.Bishop: bishop_table[::-1],
-                       PieceType.Rook: rook_table[::-1], PieceType.Queen: [row[::-1] for row in queen_table[::-1]], PieceType.Empty: empty_table,
+    PieceColor.Black: {PieceType.Pawn: pawn_table[::-1], PieceType.Knight: knight_table,
+                       PieceType.Bishop: bishop_table[::-1],
+                       PieceType.Rook: rook_table[::-1], PieceType.Queen: [row[::-1] for row in queen_table[::-1]],
+                       PieceType.Empty: empty_table,
                        PieceType.King: empty_table},
     PieceColor.Empty: {PieceType.Pawn: pawn_table, PieceType.Knight: knight_table, PieceType.Bishop: bishop_table,
                        PieceType.Rook: rook_table, PieceType.Queen: queen_table, PieceType.Empty: empty_table,
                        PieceType.King: empty_table}
 }
 
+def fen_converter(string):
+    pieces = []
+    row = []
+    for char in string:
+        if char == "/":
+            pieces.append(row)
+            row = []
+        elif char.isdigit():
+            for _ in range(int(char)):
+                row.append(Piece())
+
+        else:
+            row.append(Piece(char))
+
+    pieces.append(row)
+    return pieces
+
+
+
+
 
 class Board:
-    def __init__(self, depth=3):
-        self.pieces = [
-            [Piece(i, 0) for i in range(NUM_ROWS)],
-            [Piece(i, 1) for i in range(NUM_ROWS)],
-            [Piece() for _ in range(NUM_ROWS)],
-            [Piece() for _ in range(NUM_ROWS)],
-            [Piece() for _ in range(NUM_ROWS)],
-            [Piece() for _ in range(NUM_ROWS)],
-            [Piece(i, 6) for i in range(NUM_ROWS)],
-            [Piece(i, 7) for i in range(NUM_ROWS)]
-        ]
+    def __init__(self, depth=3, string="rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"):
+        string = string.split()
+        self.pieces = fen_converter(string[0])
         self.source_coord = (-1, -1)
         self.moved_to = (-1, -1)
         self.turn = 1
@@ -94,7 +104,6 @@ class Board:
             self.ai = None
         else:
             self.ai = AI(depth)
-
 
     def click(self, xpos, ypos):
         xc = xpos // CLENGTH
@@ -395,13 +404,14 @@ class Board:
                 self.highlight_cells()
                 for coord in self.highlighted_cells:
                     x, y = coord
-                    if self.pieces[y][x].piece_type is PieceType.King and self.pieces[y][x].color.value is not self.turn:
+                    if self.pieces[y][x].piece_type is PieceType.King and self.pieces[y][
+                        x].color.value is not self.turn:
                         self.turn *= -1
                         return True
         self.turn *= -1
         return False
 
-    #@lru_cache(maxsize=None)
+    # @lru_cache(maxsize=None)
     def evaluate(self):
         if self.quit:
             print("quit")
@@ -423,6 +433,3 @@ class Board:
         # add copy stuff
 
         return pickle.loads(pickle.dumps(self, -1))
-
-
-

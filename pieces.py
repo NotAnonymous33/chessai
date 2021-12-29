@@ -1,6 +1,7 @@
 from constants import *
 from enum import Enum
 
+
 class PieceColor(Enum):
     Black = -1
     White = 1
@@ -17,42 +18,35 @@ class PieceType(Enum):
     Queen = 900
     King = 20000
 
-pieces_order = [PieceType.Rook, PieceType.Knight, PieceType.Bishop, PieceType.Queen,
-                PieceType.King, PieceType.Bishop, PieceType.Knight, PieceType.Rook]
-pieces_order_char = ["R", "N", "B", "Q", "K", "B", "N", "R"]
+
+pieces_dict = {"r": PieceType.Rook, "n": PieceType.Knight, "b": PieceType.Bishop, "q": PieceType.Queen,
+               "k": PieceType.King, "p": PieceType.Pawn}
 
 
 class Piece:
-    def __init__(self, x=-1, y=-1):
-        # sorting out color of piece
-        if x == -1:
+    def __init__(self, string="", moved=False, x=-1):
+        # for blank pieces
+        if string == "":
             self.moved = False
             self.color = PieceColor.Empty
             self.piece_type = PieceType.Empty
             return
-        if y < 3:
-            self.color = PieceColor.Black
-            img = "b"
-        else:
+
+        if string.isupper():
             self.color = PieceColor.White
-            img = "w"
-
-        # type of piece
-        if y == 0 or y == 7:
-            self.piece_type = pieces_order[x]
-            img += pieces_order_char[x]
         else:
-            self.piece_type = PieceType.Pawn
-            img += "p"
+            self.color = PieceColor.Black
 
-        # image of piece
-        self.image = img
-        if y == 8:
+        self.piece_type = pieces_dict[string.lower()]
+        self.moved = moved
+        self.image = string
+
+        if x != -1:
             self.image = ba[x]
         self.moved = False
 
     def __repr__(self):
-        return f"{self.color} {self.piece_type}, {self.moved=}"
+        return f"{self.color} {self.piece_type} {self.moved=}"
 
     """
     def copyp(self):
@@ -67,7 +61,6 @@ class Piece:
     """
 
 
-
 class Cell:
     def __init__(self, x, y):
         self.xcoor = x * CLENGTH
@@ -79,6 +72,7 @@ class Cell:
 
     def __repr__(self):
         return f"({self.xcoor}, {self.ycoor})"
+
 
 """
 class Empty:

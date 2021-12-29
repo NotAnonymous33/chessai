@@ -1,4 +1,3 @@
-# from copy import deepcopy
 from constants import *
 from timer import timer
 from functools import lru_cache
@@ -70,7 +69,7 @@ class AI:
                 #         best_source = (col, row)
                 #         best_move = highlighted[x]
                 #     x += 1
-                # pass
+
 
                 for move in highlighted:
                     # temp_board = deepcopy(board)
@@ -86,6 +85,11 @@ class AI:
 
         board.source_coord = best_source
         board.move_piece(*best_move)
+
+    # def get_eval(self, move, board):
+    #     temp_board = pickle.loads(pickle.dumps(board, -1))
+    #     temp_board.move_piece(*move)
+    #     return self.minimax(temp_board, self.depth, True)
 
     # @cache
     # @lru_cache(maxsize=None)
