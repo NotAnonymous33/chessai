@@ -24,7 +24,7 @@ pieces_dict = {"r": PieceType.Rook, "n": PieceType.Knight, "b": PieceType.Bishop
 
 
 class Piece:
-    def __init__(self, string="", moved=False, x=-1):
+    def __init__(self, string="", moved=False, x=-1, y=-1):
         # for blank pieces
         if string == "":
             self.moved = False
@@ -44,6 +44,11 @@ class Piece:
         if x != -1:
             self.image = ba[x]
         self.moved = False
+        if self.piece_type == PieceType.Pawn:
+            print(f"{y=}")
+            if self.color == PieceColor.White and y != 6 or self.color == PieceColor.Black and y != 2:
+                self.moved = True
+
 
     def __repr__(self):
         return f"{self.color} {self.piece_type} {self.moved=}"

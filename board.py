@@ -71,16 +71,18 @@ tables = {
 def fen_converter(string):
     pieces = []
     row = []
+    row_num = 0
     for char in string:
         if char == "/":
             pieces.append(row)
             row = []
+            row_num += 1
         elif char.isdigit():
             for _ in range(int(char)):
                 row.append(Piece())
 
         else:
-            row.append(Piece(char))
+            row.append(Piece(char, y=row_num))
 
     pieces.append(row)
     return pieces
@@ -90,7 +92,7 @@ def fen_converter(string):
 
 
 class Board:
-    def __init__(self, depth=3, string="rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"):
+    def __init__(self, depth=3, string=STRING):
         string = string.split()
         self.pieces = fen_converter(string[0])
         self.source_coord = (-1, -1)
@@ -313,7 +315,6 @@ class Board:
             self.pieces[py][px] = Piece(x, 7 * self.turn)
             self.pieces[py][px].moved = False
             self.promote = False
-            print("false")
         elif self.pieces[py][px].piece_type == PieceType.Pawn and y % 7 == 0:
             # wait for input from user asking which piece to turn into
             self.pieces[y][x] = self.pieces[py][px]

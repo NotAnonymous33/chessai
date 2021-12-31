@@ -2,9 +2,10 @@ from board import Board
 import drawer
 from button import Button
 from constants import *
+import pyperclip
 
 
-
+# 1k6/8/8/8/3Q4/8/6pp/K7 testing bugs
 
 def main():
     global DEPTH
@@ -22,7 +23,7 @@ def main():
     buttons.append(Button(100, 300, 300, 50, 3, "Continue Game"))  # continue game button
     buttons.append(Button(100, 400, 300, 50, 4, "Settings"))  # continue game button
     buttons.append(Button(100, 500, 300, 50, 6, "New Game vs Player"))  # continue game button
-
+    buttons.append(Button(450, 200, 100, 50, 7, "FEN from clipboard"))  # FEN AI button
 
     quit = Button(525, 600, 75, 75, 2, "Quit")  # quit button
 
@@ -40,6 +41,7 @@ def main():
     # 4 ... -1 depth
     # 5 ... +1 depth
     # 6 ... New game vs player
+    # 7 ... new game vs ai with fen
 
     while running:
         # Menu
@@ -84,12 +86,13 @@ def main():
             quit.draw()
 
         # New game
-        elif option == 1 or option == 6:
-            print(DEPTH)
+        elif option == 1 or option == 6 or option == 7:
             if option == 1:
                 board = Board(DEPTH)
-            else:
-                board = Board(0)
+            elif option == 6:
+                board = Board(depth=0)
+            elif option == 7:
+                board = Board(string=pyperclip.paste())
             option = 3
 
         # Settings
