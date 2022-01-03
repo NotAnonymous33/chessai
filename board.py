@@ -120,8 +120,10 @@ class Board:
         if y % 7 == 0 and self.pieces[y][x].piece_type == PieceType.Pawn:
             self.highlight_cells(True)
             self.move_piece(xc, yc, True)
-            if self.ai:
+            if self.ai and not self.promote:
                 self.ai.move(self)
+                if self.turn == -1:
+                    self.ai.move()
             self.reset_source()
             return
 
@@ -142,8 +144,10 @@ class Board:
         # there is a source cell
         if not self.promote and (xc, yc) in self.highlighted_cells:
             self.move_piece(xc, yc, True)
-            if self.ai:
+            if self.ai and not self.promote:
                 self.ai.move(self)
+                if self.turn == -1:
+                    self.ai.move()
 
         if not self.promote:
             self.reset_source()
@@ -153,7 +157,7 @@ class Board:
             self.highlighted_cells = set([(i, 8) for i in range(4)])
             return
         self.highlighted_cells = set([])
-        x, y = self.source_coord  # really do be wishing python 3.10 were here
+        x, y = self.source_coord
         if self.pieces[y][x].piece_type is PieceType.Pawn:
             self.highlight_pawn()
         elif self.pieces[y][x].piece_type is PieceType.Bishop:
@@ -175,7 +179,6 @@ class Board:
                 if not new_board.is_check():
                     new_moves.add(move)
             self.highlighted_cells = new_moves
-
         self.highlighted_cells.discard((x, y))
 
     def highlight_pawn(self):
@@ -312,7 +315,17 @@ class Board:
         px, py = self.source_coord
 
         if self.promote:
-            self.pieces[py][px] = Piece(x, 7 * self.turn)
+            if x == 0:
+                promoting_piece = "R"
+            elif x == 1:
+                promoting_piece = "N"
+            elif x == 2:
+                promoting_piece = "B"
+            elif x == 3:
+                promoting_piece = "Q"
+            if self.turn == -1:
+                promoting_piece = promoting_piece.lower()
+            self.pieces[py][px] = Piece(string=promoting_piece)
             self.pieces[py][px].moved = False
             self.promote = False
         elif self.pieces[py][px].piece_type == PieceType.Pawn and y % 7 == 0:

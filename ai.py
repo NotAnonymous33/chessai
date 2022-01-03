@@ -70,7 +70,6 @@ class AI:
                 #         best_move = highlighted[x]
                 #     x += 1
 
-
                 for move in highlighted:
                     # temp_board = deepcopy(board)
                     temp_board = pickle.loads(pickle.dumps(board, -1))
@@ -85,6 +84,7 @@ class AI:
 
         board.source_coord = best_source
         board.move_piece(*best_move)
+        print(board.promote)
 
     # def get_eval(self, move, board):
     #     temp_board = pickle.loads(pickle.dumps(board, -1))
@@ -134,8 +134,8 @@ class AI:
                             if beta <= alpha:
                                 return maxEval
             return maxEval
-        # if not white
 
+        # if not white
         minEval = 999999999
         for rowy in range(NUM_ROWS)[::-1]:
             for colx in range(NUM_ROWS)[::-1]:
@@ -147,7 +147,16 @@ class AI:
                     for move in board.highlighted_cells:
                         temp_board = board.copyboard()
                         temp_board.move_piece(*move)
-                        eval = self.minimax(temp_board, depth - 1, not white, alpha, beta)
+                        if temp_board.promote:
+                            print("testing")
+                            lowest_promoting_eval = 999999999
+                            for promoting_move in temp_board.highlighted_cells:
+                                promoting_eval = self.minimax(temp_board, 1, white, alpha, beta)
+                                if promoting_eval < lowest_promoting_eval:
+                                    lowest_promoting_eval = promoting_eval
+                            eval = lowest_promoting_eval
+                        else:
+                            eval = self.minimax(temp_board, depth - 1, not white, alpha, beta)
                         minEval = min(minEval, eval)
                         beta = min(beta, eval)
                         if beta <= alpha:

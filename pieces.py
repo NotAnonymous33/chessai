@@ -45,8 +45,7 @@ class Piece:
             self.image = ba[x]
         self.moved = False
         if self.piece_type == PieceType.Pawn:
-            print(f"{y=}")
-            if self.color == PieceColor.White and y != 6 or self.color == PieceColor.Black and y != 2:
+            if self.color == PieceColor.White and y != 6 or self.color == PieceColor.Black and y != 1:
                 self.moved = True
 
 

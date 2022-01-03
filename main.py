@@ -5,10 +5,11 @@ from constants import *
 import pyperclip
 
 
-# 1k6/8/8/8/3Q4/8/6pp/K7 testing bugs
+# 1k6/8/8/8/4P3/8/7p/K7 testing AI promoting
+# 8/7P/8/5k2/8/8/8/1K6 testing user promoting - working
+# 4k2r/R7/8/8/8/8/8/3R1R2 testing castling for ai - Does know how to castle
 
-def main():
-    global DEPTH
+def main(depth):
     clock = pygame.time.Clock()
     pygame.display.set_caption("Chess by Ismail Choudhury")
     title = pygame.font.SysFont("Comic Sans MS", 70)
@@ -88,7 +89,7 @@ def main():
         # New game
         elif option == 1 or option == 6 or option == 7:
             if option == 1:
-                board = Board(DEPTH)
+                board = Board(depth)
             elif option == 6:
                 board = Board(depth=0)
             elif option == 7:
@@ -100,7 +101,7 @@ def main():
             WIN.fill(MCOLOR)
             text = title.render("Settings", True, (0, 0, 0))
             WIN.blit(text, (TLENGTH // 2 - 150, 100))
-            depth_text = normal.render(f"{DEPTH = }", True, (0, 0, 0))
+            depth_text = normal.render(f"{depth = }", True, (0, 0, 0))
             WIN.blit(depth_text, (100, 200))
 
             for event in pygame.event.get():
@@ -114,9 +115,9 @@ def main():
                     for button in settings:
                         if (val := button.click(*pos)) != -1:
                             if val == 4:
-                                DEPTH -= 1
+                                depth -= 1
                             elif val == 5:
-                                DEPTH += 1
+                                depth += 1
 
 
                 for button in settings:
@@ -133,8 +134,9 @@ def main():
         clock.tick(FPS)
 
 
+
 if __name__ == "__main__":
-    main()
+    main(DEPTH)
 
 
 pygame.quit()

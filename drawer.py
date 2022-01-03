@@ -7,10 +7,7 @@ cells = [[Cell(col, row) for col in range(NUM_ROWS)] for row in range(NUM_ROWS)]
 def draw_piece(piece, x, y):
     if not piece.color.value:
         return
-    if y == 8:
-        img = NIMAGES[piece.image]
-    else:
-        img = IMAGES[piece.image]
+    img = IMAGES[piece.image]
 
     WIN.blit(img, (x * CLENGTH, y * CLENGTH))
 
@@ -33,6 +30,10 @@ def draw_pieces(board):
     for row_num in range(NUM_ROWS):
         for col_num in range(NUM_ROWS):
             draw_piece(board.pieces[row_num][col_num], col_num, row_num)
+
+def draw_promoting():
+    for i, p in enumerate(["rook", "knight", "bishop", "queen"]):
+        WIN.blit(NIMAGES[p], (i * CLENGTH, 8 * CLENGTH))
 
 
 def draw(board):
@@ -62,6 +63,4 @@ def draw(board):
     draw_pieces(board)
 
     if board.promote:
-        for i in range(4):
-            piece = Piece(i, 8)
-            draw_piece(piece, i, 8)
+        draw_promoting()
