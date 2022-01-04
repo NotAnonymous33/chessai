@@ -5,10 +5,12 @@ from constants import *
 import pyperclip
 
 
-# 1k6/8/8/8/4P3/8/7p/K7 testing AI promoting
+# 3k4/8/8/8/8/4R3/1K5p/8 testing AI promoting - possibly working
+# 3k4/R7/8/8/8/4R3/7p/2RK4 second testing - working
 # 8/7P/8/5k2/8/8/8/1K6 testing user promoting - working
-# 4k2r/R7/8/8/8/8/8/3R1R2 testing castling for ai - Does know how to castle
-
+# 8/5P2/2b5/4k3/8/8/1K6/8 testing user promoting 2 - working
+# 4k2r/R7/8/8/8/8/8/3R1R2 testing castling for ai - working - Does know how to castle
+# 5k2/8/8/2r5/8/P2Q4/1K2p1Q1/8 testing decision making with castling
 def main(depth):
     clock = pygame.time.Clock()
     pygame.display.set_caption("Chess by Ismail Choudhury")
@@ -89,11 +91,11 @@ def main(depth):
         # New game
         elif option == 1 or option == 6 or option == 7:
             if option == 1:
-                board = Board(depth)
+                board = Board(depth=depth)
             elif option == 6:
                 board = Board(depth=0)
             elif option == 7:
-                board = Board(string=pyperclip.paste())
+                board = Board(string=pyperclip.paste(), depth=depth)
             option = 3
 
         # Settings

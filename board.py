@@ -120,10 +120,11 @@ class Board:
         if y % 7 == 0 and self.pieces[y][x].piece_type == PieceType.Pawn:
             self.highlight_cells(True)
             self.move_piece(xc, yc, True)
+            print(f"{self.turn=}")
             if self.ai and not self.promote:
+                print(self.turn)
                 self.ai.move(self)
-                if self.turn == -1:
-                    self.ai.move()
+                print(self.turn)
             self.reset_source()
             return
 
@@ -146,18 +147,17 @@ class Board:
             self.move_piece(xc, yc, True)
             if self.ai and not self.promote:
                 self.ai.move(self)
-                if self.turn == -1:
-                    self.ai.move()
+
 
         if not self.promote:
             self.reset_source()
 
     def highlight_cells(self, recur=False):
-        if self.promote:
+        x, y = self.source_coord
+        if self.promote and self.pieces[y][x].piece_type is PieceType.Pawn and y % 7 == 0:
             self.highlighted_cells = set([(i, 8) for i in range(4)])
             return
         self.highlighted_cells = set([])
-        x, y = self.source_coord
         if self.pieces[y][x].piece_type is PieceType.Pawn:
             self.highlight_pawn()
         elif self.pieces[y][x].piece_type is PieceType.Bishop:
@@ -183,6 +183,8 @@ class Board:
 
     def highlight_pawn(self):
         x, y = self.source_coord
+        if y % 7 == 0:
+            return
         # if the piece in front is empty add that cell
         if self.pieces[y - self.turn][x].color.value == 0:
             self.highlighted_cells.add((x, y - self.turn))
@@ -308,6 +310,7 @@ class Board:
     def reset_source(self):
         self.source_coord = (-1, -1)
         self.highlighted_cells = set([])
+        # self.promote = False
 
     def move_piece(self, x, y, first=False):
         self.moved_to = (x, y)
@@ -326,9 +329,9 @@ class Board:
             if self.turn == -1:
                 promoting_piece = promoting_piece.lower()
             self.pieces[py][px] = Piece(string=promoting_piece)
-            self.pieces[py][px].moved = False
+            self.pieces[py][px].moved = True
             self.promote = False
-        elif self.pieces[py][px].piece_type == PieceType.Pawn and y % 7 == 0:
+        elif self.pieces[py][px].piece_type == PieceType.Pawn and y % 7 == 0 and first:
             # wait for input from user asking which piece to turn into
             self.pieces[y][x] = self.pieces[py][px]
             self.pieces[py][px] = Piece()
@@ -389,9 +392,8 @@ class Board:
                 self.source_coord = (col_num, row_num)
                 self.highlight_cells(True)
                 if self.highlighted_cells != set([]): return
-        print("checkmate noob")
         self.quit = True
-        pygame.quit()
+
 
     def is_check(self):
         for row_num in range(NUM_ROWS):

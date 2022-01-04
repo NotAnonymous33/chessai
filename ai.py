@@ -14,7 +14,7 @@ from itertools import repeat
 
 
 class AI:
-    def __init__(self, depth=1):
+    def __init__(self, depth):
         self.depth = depth - 1
 
     @timer
@@ -45,8 +45,8 @@ class AI:
         best_source = (0, 0)
         lowest_eval = 99999999999
         best_move = None
+        promoting = False
         for row in range(NUM_ROWS):
-            print(row)
             for col in range(NUM_ROWS):
                 if board.pieces[row][col].color.value != -1:
                     continue
@@ -70,21 +70,45 @@ class AI:
                 #         best_move = highlighted[x]
                 #     x += 1
 
+
                 for move in highlighted:
-                    # temp_board = deepcopy(board)
-                    temp_board = pickle.loads(pickle.dumps(board, -1))
-                    temp_board.move_piece(*move)
+                    temp_board = board.copyboard()
+                    temp_board.move_piece(*move, True)
+                    pass
+                    # if promoting then need to add some stuff here
+                    # make sure to do that
+                    # causes big unexpected problems
+                    # took a while to figure out this was the source of those problems
+                    if temp_board.promote:
+                        evals = []
+                        for promoting_move in temp_board.highlighted_cells:
+                            promoting_temp_board = temp_board.copyboard()
+                            promoting_temp_board.move_piece(*promoting_move, True)
+                            promoting_eval = self.minimax(promoting_temp_board, self.depth, True)
+                            if promoting_eval < lowest_eval:
+                                lowest_eval = promoting_eval
+                                best_source = (col, row)
+                                best_move = move
+                                promoting = True
+                                best_promoting_move = promoting_move
+
+
                     # add for if pawn y = 0
                     # add castling
-                    evaluation = self.minimax(temp_board, self.depth, True)
-                    if evaluation < lowest_eval:
-                        lowest_eval = evaluation
-                        best_source = (col, row)
-                        best_move = move
+                    else:
+                        evaluation = self.minimax(temp_board, self.depth, True)
+                        if evaluation < lowest_eval:
+                            lowest_eval = evaluation
+                            best_source = (col, row)
+                            best_move = move
+                            promoting = False
 
         board.source_coord = best_source
-        board.move_piece(*best_move)
-        print(board.promote)
+        board.move_piece(*best_move, True)
+        if promoting:
+            board.move_piece(*best_promoting_move, True)
+
+
 
     # def get_eval(self, move, board):
     #     temp_board = pickle.loads(pickle.dumps(board, -1))
@@ -127,8 +151,19 @@ class AI:
 
                         for move in board.highlighted_cells:
                             temp_board = board.copyboard()
-                            temp_board.move_piece(*move)
-                            eval = self.minimax(temp_board, depth - 1, not white, alpha, beta)
+                            temp_board.move_piece(*move, True)
+                            if temp_board.promote:
+                                highest_promoting_eval = -999999999
+                                for promoting_move in temp_board.highlighted_cells:
+                                    promoting_temp_board = temp_board.copyboard()
+                                    promoting_temp_board.move_piece(*promoting_move, True)
+                                    promoting_eval = self.minimax(promoting_temp_board, 1, white, alpha, beta)
+                                    if promoting_eval > highest_promoting_eval:
+                                        highest_promoting_eval = promoting_eval
+                                eval = highest_promoting_eval
+                            else:
+                                eval = self.minimax(temp_board, depth - 1, not white, alpha, beta)
+
                             maxEval = max(maxEval, eval)
                             alpha = max(alpha, eval)
                             if beta <= alpha:
@@ -146,12 +181,13 @@ class AI:
 
                     for move in board.highlighted_cells:
                         temp_board = board.copyboard()
-                        temp_board.move_piece(*move)
+                        temp_board.move_piece(*move, True)
                         if temp_board.promote:
-                            print("testing")
                             lowest_promoting_eval = 999999999
                             for promoting_move in temp_board.highlighted_cells:
-                                promoting_eval = self.minimax(temp_board, 1, white, alpha, beta)
+                                promoting_temp_board = temp_board.copyboard()
+                                promoting_temp_board.move_piece(*promoting_move, True)
+                                promoting_eval = self.minimax(promoting_temp_board, 1, white, alpha, beta)
                                 if promoting_eval < lowest_promoting_eval:
                                     lowest_promoting_eval = promoting_eval
                             eval = lowest_promoting_eval
@@ -177,7 +213,7 @@ class AI:
         #
         #             for move in board.highlighted_cells:
         #                 temp_board = board.copyboard()
-        #                 temp_board.move_piece(*move)
+        #                 temp_board.move_piece(*move, True)
         #                 evals.append(self.minimax(temp_board, depth - 1, not white))
         # if not len(evals):
         #     return 0
