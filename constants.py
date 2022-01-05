@@ -3,7 +3,7 @@ pygame.init()
 
 STRING = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"
 # STRING = "rnbqkbnr/pp1ppppp/8/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R b KQkq - 1 2"
-DEPTH = 3  # speed = 0.02 * 24^(depth - 1)
+DEPTH = 5  # speed = 0.02 * 24^(depth - 1)
 LCOLOR = (240, 230, 220)
 RCOLOR = (199, 117, 61)
 MCOLOR = (220, 173, 140)

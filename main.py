@@ -6,6 +6,8 @@ import pyperclip
 
 
 # 3k4/8/8/8/8/4R3/1K5p/8 testing AI promoting - possibly working
+# https://www.youtube.com/watch?v=6r_VKSdpRH8
+# rnbqk1nr/ppp2ppp/8/4P3/1BP5/8/PP3pPP/RN1QKBNR testing yt vid - move king up 1
 # 3k4/R7/8/8/8/4R3/7p/2RK4 second testing - working
 # 8/7P/8/5k2/8/8/8/1K6 testing user promoting - working
 # 8/5P2/2b5/4k3/8/8/1K6/8 testing user promoting 2 - working

@@ -46,8 +46,9 @@ class AI:
         lowest_eval = 99999999999
         best_move = None
         promoting = False
-        for row in range(NUM_ROWS):
-            for col in range(NUM_ROWS):
+        for row in range(NUM_ROWS)[::-1]:
+            for col in range(NUM_ROWS)[::-1]:
+                print(col, row)
                 if board.pieces[row][col].color.value != -1:
                     continue
                 board.reset_source()
@@ -135,6 +136,7 @@ class AI:
             else return lowest
 
         '''
+
         if depth == 0:
             return board.evaluate()
         # do stuff

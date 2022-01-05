@@ -120,11 +120,11 @@ class Board:
         if y % 7 == 0 and self.pieces[y][x].piece_type == PieceType.Pawn:
             self.highlight_cells(True)
             self.move_piece(xc, yc, True)
-            print(f"{self.turn=}")
+            #print(f"{self.turn=}")
             if self.ai and not self.promote:
-                print(self.turn)
+                #print(self.turn)
                 self.ai.move(self)
-                print(self.turn)
+                #print(self.turn)
             self.reset_source()
             return
 
@@ -430,7 +430,7 @@ class Board:
     # @lru_cache(maxsize=None)
     def evaluate(self):
         if self.quit:
-            print("quit")
+            #print("quit")
             return self.turn * 99999999
 
         # add enumerate here
