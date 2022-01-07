@@ -68,6 +68,7 @@ tables = {
                        PieceType.King: empty_table}
 }
 
+
 def fen_converter(string):
     pieces = []
     row = []
@@ -88,13 +89,17 @@ def fen_converter(string):
     return pieces
 
 
-
-
-
 class Board:
     def __init__(self, depth=3, string=STRING):
         string = string.split()
         self.pieces = fen_converter(string[0])
+        for y, row in enumerate(self.pieces):
+            for x, piece in enumerate(row):
+                if piece.piece_type is PieceType.King:
+                    if piece.color is PieceColor.White:
+                        self.white_king = (x, y)
+                    else:
+                        self.black_king = (x, y)
         self.source_coord = (-1, -1)
         self.moved_to = (-1, -1)
         self.turn = 1
@@ -120,11 +125,11 @@ class Board:
         if y % 7 == 0 and self.pieces[y][x].piece_type == PieceType.Pawn:
             self.highlight_cells(True)
             self.move_piece(xc, yc, True)
-            #print(f"{self.turn=}")
+            # print(f"{self.turn=}")
             if self.ai and not self.promote:
-                #print(self.turn)
+                # print(self.turn)
                 self.ai.move(self)
-                #print(self.turn)
+                # print(self.turn)
             self.reset_source()
             return
 
@@ -147,7 +152,6 @@ class Board:
             self.move_piece(xc, yc, True)
             if self.ai and not self.promote:
                 self.ai.move(self)
-
 
         if not self.promote:
             self.reset_source()
@@ -344,6 +348,10 @@ class Board:
         else:
             # castling
             if self.pieces[py][px].piece_type == PieceType.King:
+                if self.turn == 1:
+                    self.white_king = (x, y)
+                else:
+                    self.black_king = (x, y)
                 if abs((d := x - px)) == 2:
                     d //= 2
                     rookx = max([0, d]) * 7
@@ -388,25 +396,28 @@ class Board:
     def check_checkmate(self):
         for row_num in range(NUM_ROWS):
             for col_num in range(NUM_ROWS):
-                if self.pieces[row_num][col_num].color.value is not self.turn: continue
-                self.source_coord = (col_num, row_num)
-                self.highlight_cells(True)
-                if self.highlighted_cells != set([]): return
-        self.quit = True
-
-
-    def is_check(self):
-        for row_num in range(NUM_ROWS):
-            for col_num in range(NUM_ROWS):
                 if self.pieces[row_num][col_num].color.value is not self.turn:
                     continue
                 self.source_coord = (col_num, row_num)
+                self.highlight_cells(True)
+                if self.highlighted_cells != set([]):
+                    return
+        self.quit = True
+
+    def is_check(self):
+        if self.turn == 1:
+            king = self.black_king
+        else:
+            king = self.white_king
+
+        for y, row in enumerate(self.pieces):
+            for x, piece in enumerate(row):
+                if piece.color.value is not self.turn:
+                    continue
+                self.source_coord = (x, y)
                 self.highlight_cells()
-                for coord in self.highlighted_cells:
-                    x, y = coord
-                    if not self.promote and self.pieces[y][x].piece_type is PieceType.King and self.pieces[y][
-                        x].color.value is not self.turn:
-                        return True
+                if king in self.highlighted_cells:
+                    return True
         return False
 
     def opponent_check(self):
@@ -430,7 +441,7 @@ class Board:
     # @lru_cache(maxsize=None)
     def evaluate(self):
         if self.quit:
-            #print("quit")
+            # print("quit")
             return self.turn * 99999999
 
         # add enumerate here

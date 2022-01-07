@@ -1,8 +1,6 @@
 from constants import *
 from timer import timer
 from functools import lru_cache
-from numba import njit
-import pickle
 
 
 import concurrent.futures
@@ -81,7 +79,6 @@ class AI:
                     # causes big unexpected problems
                     # took a while to figure out this was the source of those problems
                     if temp_board.promote:
-                        evals = []
                         for promoting_move in temp_board.highlighted_cells:
                             promoting_temp_board = temp_board.copyboard()
                             promoting_temp_board.move_piece(*promoting_move, True)
