@@ -160,7 +160,7 @@ class Board:
         x, y = self.source_coord
         if self.promote and self.pieces[y][x].piece_type is PieceType.Pawn and y % 7 == 0:
             self.highlighted_cells = set([(i, 8) for i in range(4)])
-            return
+            return False
         self.highlighted_cells = set([])
         if self.pieces[y][x].piece_type is PieceType.Pawn:
             self.highlight_pawn()
@@ -178,7 +178,7 @@ class Board:
         if recur:
             new_moves = set([])
             for move in self.highlighted_cells:
-                new_board = self.copyboard()
+                new_board = self.copy_board()
                 new_board.move_piece(*move)
                 if not new_board.is_check():
                     new_moves.add(move)
@@ -194,8 +194,8 @@ class Board:
             self.highlighted_cells.add((x, y - self.turn))
 
         # if the pawn hasn't moved, let it move 2 moves forward
-        if not self.pieces[y][x].moved and self.pieces[y - 2 * self.turn][x].color.value == self.pieces[y - self.turn][
-            x].color.value == 0:
+        if not self.pieces[y][x].moved and \
+                self.pieces[y - 2 * self.turn][x].color.value == self.pieces[y - self.turn][x].color.value == 0:
             self.highlighted_cells.add((x, y - 2 * self.turn))
 
         # if the piece to the left and right corner are opposite color, add them to highlighted piece
@@ -242,8 +242,10 @@ class Board:
 
     def check_knight(self, dx, dy):
         x, y = self.source_coord
-        if not (0 <= x + dx <= 7): return
-        if not (0 <= y + dy <= 7): return
+        if not (0 <= x + dx <= 7):
+            return
+        if not (0 <= y + dy <= 7):
+            return
         if self.pieces[y + dy][x + dx].color.value is not self.turn:  # 2 right 1 up
             self.highlighted_cells.add((x + dx, y + dy))
 
@@ -288,16 +290,19 @@ class Board:
         # add castling to right
         if self.check:  # no castling allowed if in check
             return
-        if self.pieces[y][x].moved: return  # no castling allowed if king has moved
-        if not self.pieces[y][7].color.value: return
+        if self.pieces[y][x].moved:
+            return  # no castling allowed if king has moved
+        if not self.pieces[y][7].color.value:
+            return
 
         if not self.pieces[y][7].moved and (
                 self.pieces[y][x + 1].color.value == self.pieces[y][x + 2].color.value == 0):
             self.highlighted_cells.add((x + 2, y))
 
-        if not self.pieces[y][7].moved and (
-                self.pieces[y][x - 1].color.value == self.pieces[y][x - 2].color.value == self.pieces[y][
-            x - 3].color.value == 0):
+        if not self.pieces[y][7].moved and \
+                (self.pieces[y][x - 1].color.value ==
+                 self.pieces[y][x - 2].color.value ==
+                 self.pieces[y][x - 3].color.value == 0):
             self.highlighted_cells.add((x - 2, y))
             self.highlighted_cells.add((x - 3, y))
 
@@ -405,6 +410,7 @@ class Board:
         self.quit = True
 
     def is_check(self):
+        # change to only check relevant pieces on board
         if self.turn == 1:
             king = self.black_king
         else:
@@ -418,30 +424,12 @@ class Board:
                 self.highlight_cells()
                 if king in self.highlighted_cells:
                     return True
-        return False
 
-    def opponent_check(self):
-        self.turn *= -1
-        for row_num in range(NUM_ROWS):
-            for col_num in range(NUM_ROWS):
-                if self.pieces[row_num][col_num].color.value is not self.turn:
-                    continue
-                self.reset_source()
-                self.source_coord = (col_num, row_num)
-                self.highlight_cells()
-                for coord in self.highlighted_cells:
-                    x, y = coord
-                    if self.pieces[y][x].piece_type is PieceType.King and self.pieces[y][
-                        x].color.value is not self.turn:
-                        self.turn *= -1
-                        return True
-        self.turn *= -1
         return False
 
     # @lru_cache(maxsize=None)
     def evaluate(self):
         if self.quit:
-            # print("quit")
             return self.turn * 99999999
 
         # add enumerate here
@@ -453,10 +441,5 @@ class Board:
                 # e += piece.color.value * piece.piece_type.value
         return e
 
-    def copyboard(self):
-        # new_board = deepcopy(self)
-        # new_board.pieces = [[piece.copyp() for piece in row] for row in self.pieces]
-        # new_board.highlighted_cells = deepcopy(self.highlighted_cells)
-        # add copy stuff
-
+    def copy_board(self):
         return pickle.loads(pickle.dumps(self, -1))

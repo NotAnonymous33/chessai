@@ -13,6 +13,9 @@ import pyperclip
 # 8/5P2/2b5/4k3/8/8/1K6/8 testing user promoting 2 - working
 # 4k2r/R7/8/8/8/8/8/3R1R2 testing castling for ai - working - Does know how to castle
 # 5k2/8/8/2r5/8/P2Q4/1K2p1Q1/8 testing decision making with castling
+# rnbqk1nr/pppppp1p/6P1/8/8/8/PPPPPP1P/RNBQKBNR new bug - fixed
+# 1nb1kb1r/2p1rppp/p4n2/1p6/2pqPB2/2N2BQ1/PP3PPP/R3R1K1 testing is_check speed improvement
+
 def main(depth):
     clock = pygame.time.Clock()
     pygame.display.set_caption("Chess by Ismail Choudhury")
@@ -23,20 +26,20 @@ def main(depth):
     running = True
     option = 0
 
-    buttons = []
-    buttons.append(Button(100, 200, 300, 50, 1, "New Game vs AI"))  # new game button
-    buttons.append(Button(100, 300, 300, 50, 3, "Continue Game"))  # continue game button
-    buttons.append(Button(100, 400, 300, 50, 4, "Settings"))  # continue game button
-    buttons.append(Button(100, 500, 300, 50, 6, "New Game vs Player"))  # continue game button
-    buttons.append(Button(450, 200, 100, 50, 7, "FEN from clipboard"))  # FEN AI button
+    buttons = [
+        Button(100, 200, 300, 50, 1, "New Game vs AI"),  # new game button
+        Button(100, 300, 300, 50, 3, "Continue Game"),  # continue game button
+        Button(100, 400, 300, 50, 4, "Settings"),  # continue game button
+        Button(100, 500, 300, 50, 6, "New Game vs Player"),  # continue game button
+        Button(450, 200, 100, 50, 7, "FEN from clipboard")  # FEN AI button
+    ]
 
-    quit = Button(525, 600, 75, 75, 2, "Quit")  # quit button
+    _quit = Button(525, 600, 75, 75, 2, "Quit")  # quit button
 
-    settings = []
-    settings.append(Button(300, 200, 50, 50, 4, "-"))  # decrease depth
-    settings.append(Button(400, 200, 50, 50, 5, "+"))  # increase depth
-    # settings.append(Button(100, 400, 300, 50, 4, "3"))
-
+    settings = [
+        Button(300, 200, 50, 50, 4, "-"),  # decrease depth
+        Button(400, 200, 50, 50, 5, "+")  # increase depth
+    ]
 
     # game loop
     # 0 ... Menu
@@ -53,7 +56,7 @@ def main(depth):
         if option == 0:
             WIN.fill(MCOLOR)
             text = title.render("Chess", True, (0, 0, 0))
-            WIN.blit(text, (TLENGTH//2 - 100, 100))
+            WIN.blit(text, (TLENGTH // 2 - 100, 100))
 
             for event in pygame.event.get():
                 pos = pygame.mouse.get_pos()
@@ -82,13 +85,13 @@ def main(depth):
 
                 if event.type == pygame.MOUSEBUTTONUP:
                     board.click(*pos)
-                    if quit.click(*pos) == 2:
+                    if _quit.click(*pos) == 2:
                         option = 0
 
-                quit.check_hover(*pos)
+                _quit.check_hover(*pos)
 
             drawer.draw(board)
-            quit.draw()
+            _quit.draw()
 
         # New game
         elif option == 1 or option == 6 or option == 7:
@@ -113,7 +116,7 @@ def main(depth):
                 if event.type == pygame.QUIT:
                     running = False
                 elif event.type == pygame.MOUSEBUTTONUP:
-                    if quit.click(*pos) == 2:
+                    if _quit.click(*pos) == 2:
                         option = 0
                     # check for button presses
                     for button in settings:
@@ -123,29 +126,19 @@ def main(depth):
                             elif val == 5:
                                 depth += 1
 
-
                 for button in settings:
                     button.check_hover(*pos)
-                quit.check_hover(*pos)
+                _quit.check_hover(*pos)
 
             for button in settings:
                 button.draw()
-            quit.draw()
-
-
+            _quit.draw()
 
         pygame.display.flip()
         clock.tick(FPS)
 
 
-
 if __name__ == "__main__":
     main(DEPTH)
 
-
 pygame.quit()
-
-
-
-
-

@@ -71,16 +71,16 @@ class AI:
 
 
                 for move in highlighted:
-                    temp_board = board.copyboard()
+                    temp_board = board.copy_board()
                     temp_board.move_piece(*move, True)
-                    pass
+
                     # if promoting then need to add some stuff here
                     # make sure to do that
                     # causes big unexpected problems
                     # took a while to figure out this was the source of those problems
                     if temp_board.promote:
                         for promoting_move in temp_board.highlighted_cells:
-                            promoting_temp_board = temp_board.copyboard()
+                            promoting_temp_board = temp_board.copy_board()
                             promoting_temp_board.move_piece(*promoting_move, True)
                             promoting_eval = self.minimax(promoting_temp_board, self.depth, True)
                             if promoting_eval < lowest_eval:
@@ -138,6 +138,7 @@ class AI:
             return board.evaluate()
         # do stuff
         val = [-1, 1][white]  # val = 1 if white else -1
+        board.turn = val
 
         if white:
             maxEval = -999999999
@@ -149,12 +150,12 @@ class AI:
                         board.highlight_cells(True)
 
                         for move in board.highlighted_cells:
-                            temp_board = board.copyboard()
+                            temp_board = board.copy_board()
                             temp_board.move_piece(*move, True)
                             if temp_board.promote:
                                 highest_promoting_eval = -999999999
                                 for promoting_move in temp_board.highlighted_cells:
-                                    promoting_temp_board = temp_board.copyboard()
+                                    promoting_temp_board = temp_board.copy_board()
                                     promoting_temp_board.move_piece(*promoting_move, True)
                                     promoting_eval = self.minimax(promoting_temp_board, 1, white, alpha, beta)
                                     if promoting_eval > highest_promoting_eval:
@@ -179,12 +180,12 @@ class AI:
                     board.highlight_cells(True)
 
                     for move in board.highlighted_cells:
-                        temp_board = board.copyboard()
+                        temp_board = board.copy_board()
                         temp_board.move_piece(*move, True)
                         if temp_board.promote:
                             lowest_promoting_eval = 999999999
                             for promoting_move in temp_board.highlighted_cells:
-                                promoting_temp_board = temp_board.copyboard()
+                                promoting_temp_board = temp_board.copy_board()
                                 promoting_temp_board.move_piece(*promoting_move, True)
                                 promoting_eval = self.minimax(promoting_temp_board, 1, white, alpha, beta)
                                 if promoting_eval < lowest_promoting_eval:
@@ -211,7 +212,7 @@ class AI:
         #             board.highlight_cells(True)
         #
         #             for move in board.highlighted_cells:
-        #                 temp_board = board.copyboard()
+        #                 temp_board = board.copy_board()
         #                 temp_board.move_piece(*move, True)
         #                 evals.append(self.minimax(temp_board, depth - 1, not white))
         # if not len(evals):
