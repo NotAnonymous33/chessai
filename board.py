@@ -73,17 +73,21 @@ def fen_converter(string):
     pieces = []
     row = []
     row_num = 0
+    col_num = 0
     for char in string:
         if char == "/":
             pieces.append(row)
             row = []
             row_num += 1
+            col_num = 0
         elif char.isdigit():
             for _ in range(int(char)):
                 row.append(Piece())
+            col_num += int(char)
 
         else:
-            row.append(Piece(char, y=row_num))
+            row.append(Piece(char, x=col_num, y=row_num))
+            col_num += 1
 
     pieces.append(row)
     return pieces
@@ -381,7 +385,6 @@ class Board:
 
             current = self.source_coord
             self.check = self.optimised_check((px, py), (x, y))
-            # self.check = self.is_check()
             self.source_coord = current
 
         self.turn *= -1
@@ -420,9 +423,17 @@ class Board:
     def is_check(self):
         # could check only diagonals, straights, knight pieces
         if self.turn == 1:
-            king = self.black_king
+            kx, ky = self.black_king
         else:
-            king = self.white_king
+            kx, ky = self.white_king
+
+        # check row
+        # check col
+        # check top right
+        # check top left
+        # check bottom right
+        # check bottom left
+        # check knight positions
 
         for y, row in enumerate(self.pieces):
             for x, piece in enumerate(row):
@@ -430,7 +441,7 @@ class Board:
                     continue
                 self.source_coord = (x, y)
                 self.highlight_cells()
-                if king in self.highlighted_cells:
+                if (kx, ky) in self.highlighted_cells:
                     return True
         return False
 
