@@ -44,9 +44,19 @@ class Piece:
         if x != -1:
             self.image = ba[x]
         self.moved = False
+
         if self.piece_type == PieceType.Pawn:
             if self.color == PieceColor.White and y != 6 or self.color == PieceColor.Black and y != 1:
                 self.moved = True
+
+        elif self.piece_type == PieceType.King:
+            if self.color == PieceColor.White:
+                if x != 4 or y != 7:
+                    self.moved = True
+            elif self.color == PieceColor.Black:
+                if x != 4 or y != 0:
+                    self.moved = True
+
 
 
     def __repr__(self):

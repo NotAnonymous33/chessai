@@ -326,6 +326,17 @@ class Board:
 
         px, py = self.source_coord
 
+        if self.pieces[py][px].piece_type == PieceType.Pawn and y % 7 == 0 and first:
+            # wait for input from user asking which piece to turn into
+            self.pieces[y][x] = self.pieces[py][px]
+            self.pieces[py][px] = Piece()
+            self.source_coord = (x, y)
+            self.promote = True
+            self.highlight_cells(True)
+            return
+            # get input
+            # turn the piece into whatever type it should be
+
         if self.promote:
             if x == 0:
                 promoting_piece = "R"
@@ -340,16 +351,11 @@ class Board:
             self.pieces[py][px] = Piece(string=promoting_piece)
             self.pieces[py][px].moved = True
             self.promote = False
-        elif self.pieces[py][px].piece_type == PieceType.Pawn and y % 7 == 0 and first:
-            # wait for input from user asking which piece to turn into
-            self.pieces[y][x] = self.pieces[py][px]
-            self.pieces[py][px] = Piece()
-            self.source_coord = (x, y)
-            self.promote = True
-            self.highlight_cells(True)
-            return
-            # get input
-            # turn the piece into whatever type it should be
+
+            current = self.source_coord
+            self.check = self.is_check(None, (px, py))
+            self.source_coord = current
+
         else:
             # castling
             if self.pieces[py][px].piece_type == PieceType.King:
@@ -373,9 +379,10 @@ class Board:
             self.pieces[y][x].moved = True
             self.pieces[py][px] = Piece()  # set the source piece to 0
 
-        current = self.source_coord
-        self.check = self.is_check()
-        self.source_coord = current
+            current = self.source_coord
+            self.check = self.optimised_check((px, py), (x, y))
+            # self.check = self.is_check()
+            self.source_coord = current
 
         self.turn *= -1
 
@@ -409,8 +416,9 @@ class Board:
                     return
         self.quit = True
 
+    # am i in check
     def is_check(self):
-        # change to only check relevant pieces on board
+        # could check only diagonals, straights, knight pieces
         if self.turn == 1:
             king = self.black_king
         else:
@@ -424,8 +432,99 @@ class Board:
                 self.highlight_cells()
                 if king in self.highlighted_cells:
                     return True
+        return False
+
+    # is the opponent in check
+    def optimised_check(self, prev, current):
+        # maybe only checking col row diagonals of king will be faster
+        # change to only check relevant pieces on board
+        if self.turn == 1:
+            king = self.black_king
+        else:
+            king = self.white_king
+
+        # check if piece moved puts in check
+        self.source_coord = current
+        self.highlight_cells()
+        if king in self.highlighted_cells:
+            return True
+
+        # check for discovered check - knights and pawns can only put in check after being moved
+        # add only checking straights for rook and queen / diagonals for bishop and queen
+
+        if prev is not None:
+            px, py = prev
+            # check column
+            if king[0] == px:
+                for y, piece in enumerate([row[px] for row in self.pieces]):
+                    if piece.color.value is not self.turn:
+                        continue
+                    self.source_coord = (px, y)
+                    self.highlight_cells()
+                    if king in self.highlighted_cells:
+                        return True
+
+            # check row
+            if king[1] == py:
+                for x, piece in enumerate(self.pieces[py]):
+                    if piece.color.value is not self.turn:
+                        continue
+                    self.source_coord = (x, py)
+                    self.highlight_cells()
+                    if king in self.highlighted_cells:
+                        return True
+
+            # check top right
+            self.source_coord = tuple(map(sum, zip(prev, (1, -1))))
+            while all(list(map(lambda z: 0 <= z <= 7, self.source_coord))):
+                cx, cy = self.source_coord
+                if self.pieces[cy][cx].color.value is not self.turn:
+                    self.source_coord = tuple(map(sum, zip(self.source_coord, (1, -1))))
+                    continue
+                self.highlight_cells()
+                if king in self.highlighted_cells:
+                    return True
+                self.source_coord = tuple(map(sum, zip(self.source_coord, (1, -1))))
+
+            # check top left
+            self.source_coord = tuple(map(sum, zip(prev, (-1, -1))))
+            while all(map(lambda z: 0 <= z <= 7, self.source_coord)):
+                cx, cy = self.source_coord
+                if self.pieces[cy][cx].color.value is not self.turn:
+                    self.source_coord = tuple(map(sum, zip(self.source_coord, (-1, -1))))
+                    continue
+                self.highlight_cells()
+                if king in self.highlighted_cells:
+                    return True
+                self.source_coord = tuple(map(sum, zip(self.source_coord, (-1, -1))))
+
+            # check down right
+            self.source_coord = tuple(map(sum, zip(prev, (1, 1))))
+            while all(map(lambda z: 0 <= z <= 7, self.source_coord)):
+                cx, cy = self.source_coord
+                if self.pieces[cy][cx].color.value is not self.turn:
+                    self.source_coord = tuple(map(sum, zip(self.source_coord, (1, 1))))
+                    continue
+                self.highlight_cells()
+                if king in self.highlighted_cells:
+                    return True
+                self.source_coord = tuple(map(sum, zip(self.source_coord, (1, 1))))
+
+            # check down left
+            self.source_coord = tuple(map(sum, zip(prev, (-1, 1))))
+            while all(map(lambda z: 0 <= z <= 7, self.source_coord)):
+                cx, cy = self.source_coord
+                if self.pieces[cy][cx].color.value is not self.turn:
+                    self.source_coord = tuple(map(sum, zip(self.source_coord, (-1, 1))))
+                    continue
+                self.highlight_cells()
+                if king in self.highlighted_cells:
+                    return True
+                self.source_coord = tuple(map(sum, zip(self.source_coord, (-1, 1))))
 
         return False
+
+
 
     # @lru_cache(maxsize=None)
     def evaluate(self):

@@ -15,6 +15,8 @@ import pyperclip
 # 5k2/8/8/2r5/8/P2Q4/1K2p1Q1/8 testing decision making with castling
 # rnbqk1nr/pppppp1p/6P1/8/8/8/PPPPPP1P/RNBQKBNR new bug - fixed
 # 1nb1kb1r/2p1rppp/p4n2/1p6/2pqPB2/2N2BQ1/PP3PPP/R3R1K1 testing is_check speed improvement
+# 8/1RP5/N1P5/1b2P3/k2Br3/4Pp1K/5p1b/5N2 w - - 0 1 new bug
+# 3kq3/8/8/8/8/8/8/3K4 check
 
 def main(depth):
     clock = pygame.time.Clock()
