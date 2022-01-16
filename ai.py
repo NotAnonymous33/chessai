@@ -1,12 +1,6 @@
 from constants import *
 from timer import timer
-from functools import lru_cache
-
-
 import concurrent.futures
-import time
-from itertools import repeat
-
 
 # https://stackoverflow.com/questions/6785226/pass-multiple-parameters-to-concurrent-futures-executor-map
 
@@ -54,7 +48,8 @@ class AI:
                 board.highlight_cells(True)
 
                 highlighted = list(board.highlighted_cells)
-                if not len(highlighted): continue
+                if not len(highlighted):
+                    continue
 
                 # with concurrent.futures.ProcessPoolExecutor() as exe:
                 #     results = exe.map(self.get_eval, highlighted, repeat(board))
@@ -68,7 +63,6 @@ class AI:
                 #         best_source = (col, row)
                 #         best_move = highlighted[x]
                 #     x += 1
-
 
                 for move in highlighted:
                     temp_board = board.copy_board()
@@ -90,7 +84,6 @@ class AI:
                                 promoting = True
                                 best_promoting_move = promoting_move
 
-
                     # add for if pawn y = 0
                     # add castling
                     else:
@@ -106,8 +99,6 @@ class AI:
         if promoting:
             board.move_piece(*best_promoting_move, True)
 
-
-
     # def get_eval(self, move, board):
     #     temp_board = pickle.loads(pickle.dumps(board, -1))
     #     temp_board.move_piece(*move)
@@ -116,7 +107,7 @@ class AI:
     # @cache
     # @lru_cache(maxsize=None)
     def minimax(self, board, depth, white, alpha=-999999, beta=999999) -> int:
-        '''
+        """
         white value = 1
         black value = 0
         create a list, return a value
@@ -132,7 +123,7 @@ class AI:
             if white return highest
             else return lowest
 
-        '''
+        """
 
         if depth == 0:
             return board.evaluate()
@@ -141,7 +132,7 @@ class AI:
         board.turn = val
 
         if white:
-            maxEval = -999999999
+            max_eval = -999999999
             for rowy in range(NUM_ROWS)[::-1]:
                 for colx in range(NUM_ROWS)[::-1]:
                     if board.pieces[rowy][colx].color.value == val:
@@ -164,14 +155,14 @@ class AI:
                             else:
                                 eval = self.minimax(temp_board, depth - 1, not white, alpha, beta)
 
-                            maxEval = max(maxEval, eval)
+                            max_eval = max(max_eval, eval)
                             alpha = max(alpha, eval)
                             if beta <= alpha:
-                                return maxEval
-            return maxEval
+                                return max_eval
+            return max_eval
 
         # if not white
-        minEval = 999999999
+        min_eval = 999999999
         for rowy in range(NUM_ROWS)[::-1]:
             for colx in range(NUM_ROWS)[::-1]:
                 if board.pieces[rowy][colx].color.value == val:
@@ -193,13 +184,11 @@ class AI:
                             eval = lowest_promoting_eval
                         else:
                             eval = self.minimax(temp_board, depth - 1, not white, alpha, beta)
-                        minEval = min(minEval, eval)
+                        min_eval = min(min_eval, eval)
                         beta = min(beta, eval)
                         if beta <= alpha:
-                            return minEval
-        return minEval
-
-
+                            return min_eval
+        return min_eval
 
         # # https://www.youtube.com/watch?v=l-hh51ncgDI
         # # depth is not 0

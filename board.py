@@ -425,6 +425,20 @@ class Board:
             piece = self.pieces[sy][sx]
             if piece.color.value is self.turn and piece.piece_type is PieceType.Knight:
                 return True
+        return False
+
+    def line_check(self, king, prev, direction):
+        self.source_coord = tuple(map(sum, zip(prev, direction)))
+        while all(list(map(lambda z: 0 <= z <= 7, self.source_coord))):
+            cx, cy = self.source_coord
+            if self.pieces[cy][cx].color.value == self.turn * -1:
+                return False
+            if self.pieces[cy][cx].color.value != 0:
+                self.highlight_cells()
+                if king in self.highlighted_cells:
+                    return True
+            self.source_coord = tuple(map(sum, zip(self.source_coord, direction)))
+        return False
 
     def is_check(self, prev=None, current=None):
         # maybe only checking col row diagonals of king will be faster
@@ -443,6 +457,7 @@ class Board:
             if king in self.highlighted_cells:
                 return True
         else:
+            # axby user permutations
             # check 2, 1 for knights
             if self.knight_check(prev, (2, 1)):
                 return True
@@ -487,56 +502,22 @@ class Board:
                     return True
 
         # check top right
-        self.source_coord = tuple(map(sum, zip(prev, (1, -1))))
-        while all(list(map(lambda z: 0 <= z <= 7, self.source_coord))):
-            cx, cy = self.source_coord
-            if self.pieces[cy][cx].color.value is not self.turn:
-                self.source_coord = tuple(map(sum, zip(self.source_coord, (1, -1))))
-                continue
-            self.highlight_cells()
-            if king in self.highlighted_cells:
-                return True
-            self.source_coord = tuple(map(sum, zip(self.source_coord, (1, -1))))
+        if self.line_check(king, prev, (1, -1)):
+            return True
 
         # check top left
-        self.source_coord = tuple(map(sum, zip(prev, (-1, -1))))
-        while all(map(lambda z: 0 <= z <= 7, self.source_coord)):
-            cx, cy = self.source_coord
-            if self.pieces[cy][cx].color.value is not self.turn:
-                self.source_coord = tuple(map(sum, zip(self.source_coord, (-1, -1))))
-                continue
-            self.highlight_cells()
-            if king in self.highlighted_cells:
-                return True
-            self.source_coord = tuple(map(sum, zip(self.source_coord, (-1, -1))))
+        if self.line_check(king, prev, (-1, -1)):
+            return True
 
         # check down right
-        self.source_coord = tuple(map(sum, zip(prev, (1, 1))))
-        while all(map(lambda z: 0 <= z <= 7, self.source_coord)):
-            cx, cy = self.source_coord
-            if self.pieces[cy][cx].color.value is not self.turn:
-                self.source_coord = tuple(map(sum, zip(self.source_coord, (1, 1))))
-                continue
-            self.highlight_cells()
-            if king in self.highlighted_cells:
-                return True
-            self.source_coord = tuple(map(sum, zip(self.source_coord, (1, 1))))
+        if self.line_check(king, prev, (1, 1)):
+            return True
 
         # check down left
-        self.source_coord = tuple(map(sum, zip(prev, (-1, 1))))
-        while all(map(lambda z: 0 <= z <= 7, self.source_coord)):
-            cx, cy = self.source_coord
-            if self.pieces[cy][cx].color.value is not self.turn:
-                self.source_coord = tuple(map(sum, zip(self.source_coord, (-1, 1))))
-                continue
-            self.highlight_cells()
-            if king in self.highlighted_cells:
-                return True
-            self.source_coord = tuple(map(sum, zip(self.source_coord, (-1, 1))))
+        if self.line_check(king, prev, (-1, 1)):
+            return True
 
         return False
-
-
 
     # @lru_cache(maxsize=None)
     def evaluate(self):
