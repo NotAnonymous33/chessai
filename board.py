@@ -419,7 +419,6 @@ class Board:
                     return
         self.quit = True
 
-    # is the opponent in check
     def is_check(self, prev=None, current=None):
         # maybe only checking col row diagonals of king will be faster
         # change to only check relevant pieces on board
@@ -427,6 +426,8 @@ class Board:
             king = self.black_king
         else:
             king = self.white_king
+        if prev is None:
+            prev = king
 
         if current is not None:
             # check if piece moved puts in check
@@ -434,12 +435,68 @@ class Board:
             self.highlight_cells()
             if king in self.highlighted_cells:
                 return True
+        else:
+            # check 2, 1 for knights
+            self.source_coord = tuple(map(sum, zip(prev, (2, 1))))
+            if all(list(map(lambda z: 0 <= z <= 7, self.source_coord))):
+                sx, sy = self.source_coord
+                piece = self.pieces[sy][sx]
+                if piece.color.value is self.turn and piece.piece_type is PieceType.Knight:
+                    return True
+
+            self.source_coord = tuple(map(sum, zip(prev, (-2, 1))))
+            if all(list(map(lambda z: 0 <= z <= 7, self.source_coord))):
+                sx, sy = self.source_coord
+                piece = self.pieces[sy][sx]
+                if piece.color.value is self.turn and piece.piece_type is PieceType.Knight:
+                    return True
+
+            self.source_coord = tuple(map(sum, zip(prev, (2, -1))))
+            if all(list(map(lambda z: 0 <= z <= 7, self.source_coord))):
+                sx, sy = self.source_coord
+                piece = self.pieces[sy][sx]
+                if piece.color.value is self.turn and piece.piece_type is PieceType.Knight:
+                    return True
+
+            self.source_coord = tuple(map(sum, zip(prev, (-2, -1))))
+            if all(list(map(lambda z: 0 <= z <= 7, self.source_coord))):
+                sx, sy = self.source_coord
+                piece = self.pieces[sy][sx]
+                if piece.color.value is self.turn and piece.piece_type is PieceType.Knight:
+                    return True
+
+            self.source_coord = tuple(map(sum, zip(prev, (1, 2))))
+            if all(list(map(lambda z: 0 <= z <= 7, self.source_coord))):
+                sx, sy = self.source_coord
+                piece = self.pieces[sy][sx]
+                if piece.color.value is self.turn and piece.piece_type is PieceType.Knight:
+                    return True
+
+            self.source_coord = tuple(map(sum, zip(prev, (1, -2))))
+            if all(list(map(lambda z: 0 <= z <= 7, self.source_coord))):
+                sx, sy = self.source_coord
+                piece = self.pieces[sy][sx]
+                if piece.color.value is self.turn and piece.piece_type is PieceType.Knight:
+                    return True
+
+            self.source_coord = tuple(map(sum, zip(prev, (-1, 2))))
+            if all(list(map(lambda z: 0 <= z <= 7, self.source_coord))):
+                sx, sy = self.source_coord
+                piece = self.pieces[sy][sx]
+                if piece.color.value is self.turn and piece.piece_type is PieceType.Knight:
+                    return True
+
+            self.source_coord = tuple(map(sum, zip(prev, (-1, -2))))
+            if all(list(map(lambda z: 0 <= z <= 7, self.source_coord))):
+                sx, sy = self.source_coord
+                piece = self.pieces[sy][sx]
+                if piece.color.value is self.turn and piece.piece_type is PieceType.Knight:
+                    return True
 
         # check for discovered check - knights and pawns can only put in check after being moved
         # add only checking straights for rook and queen / diagonals for bishop and queen
+        # could change is not to self.turn*-1
 
-        if prev is None:
-            prev = king
         px, py = prev
         # check column
         if king[0] == px:
