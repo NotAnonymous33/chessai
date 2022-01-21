@@ -35,7 +35,7 @@ class AI:
 
         """
         best_source = (0, 0)
-        lowest_eval = 99999999999
+        lowest_eval = 99999999
         best_move = None
         promoting = False
         for row in range(NUM_ROWS)[::-1]:
@@ -50,6 +50,7 @@ class AI:
                 highlighted = list(board.highlighted_cells)
                 if not len(highlighted):
                     continue
+                print(highlighted)
 
                 # with concurrent.futures.ProcessPoolExecutor() as exe:
                 #     results = exe.map(self.get_eval, highlighted, repeat(board))
@@ -94,6 +95,7 @@ class AI:
                             best_move = move
                             promoting = False
 
+        print(lowest_eval)
         board.source_coord = best_source
         board.move_piece(*best_move, True)
         if promoting:
@@ -106,7 +108,7 @@ class AI:
 
     # @cache
     # @lru_cache(maxsize=None)
-    def minimax(self, board, depth, white, alpha=-999999, beta=999999) -> int:
+    def minimax(self, board, depth, white, alpha=-99999999, beta=99999999) -> int:
         """
         white value = 1
         black value = 0
@@ -132,7 +134,7 @@ class AI:
         board.turn = val
 
         if white:
-            max_eval = -999999999
+            max_eval = -99999999
             for rowy in range(NUM_ROWS)[::-1]:
                 for colx in range(NUM_ROWS)[::-1]:
                     if board.pieces[rowy][colx].color.value == val:
@@ -144,7 +146,7 @@ class AI:
                             temp_board = board.copy_board()
                             temp_board.move_piece(*move, True)
                             if temp_board.promote:
-                                highest_promoting_eval = -999999999
+                                highest_promoting_eval = -99999999
                                 for promoting_move in temp_board.highlighted_cells:
                                     promoting_temp_board = temp_board.copy_board()
                                     promoting_temp_board.move_piece(*promoting_move, True)
@@ -152,6 +154,8 @@ class AI:
                                     if promoting_eval > highest_promoting_eval:
                                         highest_promoting_eval = promoting_eval
                                 eval = highest_promoting_eval
+                            elif temp_board.quit:
+                                eval = temp_board.evaluate()
                             else:
                                 eval = self.minimax(temp_board, depth - 1, not white, alpha, beta)
 
@@ -162,7 +166,7 @@ class AI:
             return max_eval
 
         # if not white
-        min_eval = 999999999
+        min_eval = 99999999
         for rowy in range(NUM_ROWS)[::-1]:
             for colx in range(NUM_ROWS)[::-1]:
                 if board.pieces[rowy][colx].color.value == val:
@@ -174,7 +178,7 @@ class AI:
                         temp_board = board.copy_board()
                         temp_board.move_piece(*move, True)
                         if temp_board.promote:
-                            lowest_promoting_eval = 999999999
+                            lowest_promoting_eval = 99999999
                             for promoting_move in temp_board.highlighted_cells:
                                 promoting_temp_board = temp_board.copy_board()
                                 promoting_temp_board.move_piece(*promoting_move, True)
@@ -182,6 +186,8 @@ class AI:
                                 if promoting_eval < lowest_promoting_eval:
                                     lowest_promoting_eval = promoting_eval
                             eval = lowest_promoting_eval
+                        elif temp_board.quit:
+                            eval = temp_board.evaluate()
                         else:
                             eval = self.minimax(temp_board, depth - 1, not white, alpha, beta)
                         min_eval = min(min_eval, eval)

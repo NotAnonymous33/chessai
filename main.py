@@ -17,6 +17,28 @@ import pyperclip
 # 1nb1kb1r/2p1rppp/p4n2/1p6/2pqPB2/2N2BQ1/PP3PPP/R3R1K1 testing is_check speed improvement
 # 8/1RP5/N1P5/1b2P3/k2Br3/4Pp1K/5p1b/5N2 w - - 0 1 new bug
 # 3kq3/8/8/8/8/8/8/3K4 check
+# 6k1/5p2/6p1/8/7p/8/6PP/7K w - - 0 1 testing
+
+def fen_check(string):
+    string = string.split()
+    if len(string) == 1 and string[0].count("/") == 7:
+        return True
+    if len(string) != 6:
+        return False
+    if string[0].count("/") != 7:
+        return False
+    if string[1] != "w" and string[1] != "b":
+        return False
+    if set(string[2]).difference(set("KQkq-")) != set([]):
+        return False
+    if not string[4].isdigit():
+        return False
+    if not string[5].isdigit():
+        return False
+    return True
+
+
+
 
 def main(depth):
     clock = pygame.time.Clock()
@@ -33,7 +55,8 @@ def main(depth):
         Button(100, 300, 300, 50, 3, "Continue Game"),  # continue game button
         Button(100, 400, 300, 50, 4, "Settings"),  # continue game button
         Button(100, 500, 300, 50, 6, "New Game vs Player"),  # continue game button
-        Button(450, 200, 100, 50, 7, "FEN from clipboard")  # FEN AI button
+        Button(450, 200, 100, 50, 7, "FEN from clipboard"),  # FEN AI button
+        Button(450, 500, 100, 50, 8, "FEN")  # FEN player button
     ]
 
     _quit = Button(525, 600, 75, 75, 2, "Quit")  # quit button
@@ -96,13 +119,23 @@ def main(depth):
             _quit.draw()
 
         # New game
-        elif option == 1 or option == 6 or option == 7:
+        elif option == 1 or option == 6 or option == 7 or option == 8:
             if option == 1:
                 board = Board(depth=depth)
             elif option == 6:
                 board = Board(depth=0)
             elif option == 7:
-                board = Board(string=pyperclip.paste(), depth=depth)
+                if fen_check((string := pyperclip.paste())):
+                    board = Board(string=string, depth=depth)
+                else:
+                    option = 0
+                    continue
+            elif option == 8:
+                if fen_check((string := pyperclip.paste())):
+                    board = Board(string=string, depth=0)
+                else:
+                    option = 0
+                    continue
             option = 3
 
         # Settings

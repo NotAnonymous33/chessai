@@ -132,6 +132,8 @@ class Board:
             if self.ai and not self.promote:
                 # print(self.turn)
                 self.ai.move(self)
+                if self.quit:
+                    print("game ended")
                 # print(self.turn)
             self.reset_source()
             return
@@ -155,6 +157,8 @@ class Board:
             self.move_piece(xc, yc, True)
             if self.ai and not self.promote:
                 self.ai.move(self)
+                if self.quit:
+                    print("game ended")
 
         if not self.promote:
             self.reset_source()
@@ -390,6 +394,9 @@ class Board:
 
         if self.check and first:
             self.check_checkmate()
+            if self.quit:
+                print("end")
+                print(self.evaluate())
 
         '''
         If king is under attack, check
@@ -522,7 +529,7 @@ class Board:
     # @lru_cache(maxsize=None)
     def evaluate(self):
         if self.quit:
-            return self.turn * 99999999
+            return self.turn * -9999999
 
         # add enumerate here
         e = 0
