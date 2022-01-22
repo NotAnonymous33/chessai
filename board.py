@@ -103,9 +103,37 @@ class Board:
                         self.white_king = (x, y)
                     else:
                         self.black_king = (x, y)
+
+        # setting turns
+        if len(string) == 1 or string[1] == "w":
+            self.turn = 1
+        else:
+            self.turn = -1
+
+        # setting clocks
+        if len(string) == 1:
+            self.half = 0
+            self.full = 0
+        else:
+            self.half = int(string[4])
+            self.full = int(string[5])
+
+            # setting castling
+            if string[3] == "-":
+                # no castling can happen
+                self.move_kings([PieceColor.White, PieceColor.Black])
+            else:
+                # castling can happen
+                if string.upper() == string:  # lower case, white cannot castle
+                    self.move_kings([PieceColor.White])
+                elif string.lower() == string:  # upper case, black cannot castle
+                    self.move_kings([PieceColor.Black])
+                else:
+                    pass
+
+
         self.source_coord = (-1, -1)
         self.moved_to = (-1, -1)
-        self.turn = 1
         self.highlighted_cells = set([])
         self.check = False
         self.quit = False
@@ -114,6 +142,13 @@ class Board:
             self.ai = None
         else:
             self.ai = AI(depth)
+
+    def move_kings(self, colors):
+        for row in self.pieces:
+            for piece in row:
+                if piece.piece_type == PieceType.King and piece.color in colors:
+                    piece.moved = True
+
 
     def click(self, xpos, ypos):
         xc = xpos // CLENGTH
