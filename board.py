@@ -119,18 +119,17 @@ class Board:
             self.full = int(string[5])
 
             # setting castling
-            if string[3] == "-":
+            if string[2] == "-":
                 # no castling can happen
                 self.move_kings([PieceColor.White, PieceColor.Black])
             else:
                 # castling can happen
-                if string.upper() == string:  # lower case, white cannot castle
+                if string[2].upper() == string[2]:  # lower case, white cannot castle
                     self.move_kings([PieceColor.White])
-                elif string.lower() == string:  # upper case, black cannot castle
+                elif string[2].lower() == string[2]:  # upper case, black cannot castle
                     self.move_kings([PieceColor.Black])
                 else:
-                    pass
-
+                    pass  # axby something should go here
 
         self.source_coord = (-1, -1)
         self.moved_to = (-1, -1)
@@ -149,7 +148,6 @@ class Board:
                 if piece.piece_type == PieceType.King and piece.color in colors:
                     piece.moved = True
 
-
     def click(self, xpos, ypos):
         xc = xpos // CLENGTH
         yc = ypos // CLENGTH
@@ -163,13 +161,6 @@ class Board:
         if y % 7 == 0 and self.pieces[y][x].piece_type == PieceType.Pawn:
             self.highlight_cells(True)
             self.move_piece(xc, yc, True)
-            # print(f"{self.turn=}")
-            if self.ai and not self.promote:
-                # print(self.turn)
-                self.ai.move(self)
-                if self.quit:
-                    print("game ended")
-                # print(self.turn)
             self.reset_source()
             return
 
@@ -190,13 +181,27 @@ class Board:
         # there is a source cell
         if not self.promote and (xc, yc) in self.highlighted_cells:
             self.move_piece(xc, yc, True)
-            if self.ai and not self.promote:
-                self.ai.move(self)
-                if self.quit:
-                    print("game ended")
+            if self.quit:
+                print("game ended")
 
         if not self.promote:
             self.reset_source()
+
+    def ai_move(self):
+        x, y = self.source_coord
+        if y % 7 == 0 and self.pieces[y][x].piece_type == PieceType.Pawn:
+            if not self.promote:
+                self.ai.move(self)
+                if self.quit:
+                    print("game ended")
+            self.reset_source()
+            return
+
+        if self.ai and not self.promote:
+            self.ai.move(self)
+            self.reset_source()
+            if self.quit:
+                print("game ended")
 
     def highlight_cells(self, recur=False):
         x, y = self.source_coord
@@ -334,14 +339,17 @@ class Board:
             return
         if self.pieces[y][x].moved:
             return  # no castling allowed if king has moved
-        if not self.pieces[y][7].color.value:
-            return
 
-        if not self.pieces[y][7].moved and (
-                self.pieces[y][x + 1].color.value == self.pieces[y][x + 2].color.value == 0):
-            self.highlighted_cells.add((x + 2, y))
 
         if not self.pieces[y][7].moved and \
+                self.pieces[y][7].piece_type == PieceType.Rook and \
+                self.pieces[y][7].color.value == self.turn and \
+                (self.pieces[y][x + 1].color.value == self.pieces[y][x + 2].color.value == 0):
+            self.highlighted_cells.add((x + 2, y))
+
+        if not self.pieces[y][0].moved and \
+                self.pieces[y][0].piece_type == PieceType.Rook and \
+                self.pieces[y][0].color.value == self.turn and \
                 (self.pieces[y][x - 1].color.value ==
                  self.pieces[y][x - 2].color.value ==
                  self.pieces[y][x - 3].color.value == 0):
@@ -429,9 +437,9 @@ class Board:
 
         if self.check and first:
             self.check_checkmate()
-            if self.quit:
-                print("end")
-                print(self.evaluate())
+            # if self.quit:
+            #     print("end")
+            #     print(self.evaluate())
 
         '''
         If king is under attack, check
