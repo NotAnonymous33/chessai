@@ -53,7 +53,13 @@ class Piece:
                 if x != 4 or y != 0:
                     self.moved = True
 
-
+    def copy(self):
+        new_piece = Piece()
+        new_piece.move = self.moved
+        new_piece.color = self.color
+        new_piece.piece_type = self.piece_type
+        new_piece.image = self.image
+        return new_piece
 
     def __repr__(self):
         return f"{self.color} {self.piece_type} {self.moved=}"

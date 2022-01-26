@@ -3,6 +3,7 @@ import drawer
 from button import Button
 from constants import *
 import pyperclip
+from ai import AI
 
 
 # 3k4/8/8/8/8/4R3/1K5p/8 testing AI promoting - possibly working
@@ -17,6 +18,7 @@ import pyperclip
 # 1nb1kb1r/2p1rppp/p4n2/1p6/2pqPB2/2N2BQ1/PP3PPP/R3R1K1 testing is_check speed improvement
 # 8/1RP5/N1P5/1b2P3/k2Br3/4Pp1K/5p1b/5N2 w - - 0 1 new bug
 # 3kq3/8/8/8/8/8/8/3K4 check
+# 1k4r1/5r2/8/8/7K/8/8/8 checkmate
 # 6k1/5p2/6p1/8/7p/8/6PP/7K w - - 0 1 testing
 
 def fen_check(string):
@@ -47,6 +49,7 @@ def main(depth):
     normal = pygame.font.SysFont("Comic Sans MS", 30)
 
     board = None
+    ai = None
     running = True
     option = 0
 
@@ -103,6 +106,8 @@ def main(depth):
             if board is None:
                 option = 0
                 continue
+            if board.turn == -1 and board.ai:
+                ai.move(board)
             for event in pygame.event.get():
                 pos = pygame.mouse.get_pos()
                 if event.type == pygame.QUIT:
@@ -122,11 +127,13 @@ def main(depth):
         elif option == 1 or option == 6 or option == 7 or option == 8:
             if option == 1:
                 board = Board(depth=depth)
+                ai = AI(depth)
             elif option == 6:
                 board = Board(depth=0)
             elif option == 7:
                 if fen_check((string := pyperclip.paste())):
                     board = Board(string=string, depth=depth)
+                    ai = AI(depth)
                 else:
                     option = 0
                     continue

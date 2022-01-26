@@ -1,6 +1,7 @@
 from pieces import *
 from ai import AI
 import pickle
+import dis
 
 pieces_order = [PieceType.Rook, PieceType.Knight, PieceType.Bishop, PieceType.Queen,
                 PieceType.King, PieceType.Bishop, PieceType.Knight, PieceType.Rook]
@@ -94,6 +95,7 @@ def fen_converter(string):
 
 class Board:
     def __init__(self, depth=3, string=STRING):
+        print(dis.dis(self.evaluate))
         string = string.split()
         self.pieces = fen_converter(string[0])
         for y, row in enumerate(self.pieces):
@@ -131,7 +133,6 @@ class Board:
                 else:
                     pass
 
-
         self.source_coord = (-1, -1)
         self.moved_to = (-1, -1)
         self.highlighted_cells = set([])
@@ -141,7 +142,9 @@ class Board:
         if depth == 0:
             self.ai = None
         else:
-            self.ai = AI(depth)
+            self.ai = True
+
+
 
     def move_kings(self, colors):
         for row in self.pieces:
@@ -164,12 +167,6 @@ class Board:
             self.highlight_cells(True)
             self.move_piece(xc, yc, True)
             # print(f"{self.turn=}")
-            if self.ai and not self.promote:
-                # print(self.turn)
-                self.ai.move(self)
-                if self.quit:
-                    print("game ended")
-                # print(self.turn)
             self.reset_source()
             return
 
@@ -190,10 +187,6 @@ class Board:
         # there is a source cell
         if not self.promote and (xc, yc) in self.highlighted_cells:
             self.move_piece(xc, yc, True)
-            if self.ai and not self.promote:
-                self.ai.move(self)
-                if self.quit:
-                    print("game ended")
 
         if not self.promote:
             self.reset_source()

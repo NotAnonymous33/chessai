@@ -1,6 +1,7 @@
 from constants import *
 from timer import timer
 import concurrent.futures
+import dis
 
 # https://stackoverflow.com/questions/6785226/pass-multiple-parameters-to-concurrent-futures-executor-map
 
@@ -8,6 +9,7 @@ import concurrent.futures
 class AI:
     def __init__(self, depth):
         self.depth = depth - 1
+
 
     @timer
     def move(self, board):
@@ -51,19 +53,6 @@ class AI:
                 if not len(highlighted):
                     continue
                 print(highlighted)
-
-                # with concurrent.futures.ProcessPoolExecutor() as exe:
-                #     results = exe.map(self.get_eval, highlighted, repeat(board))
-                #
-                # x = 0
-                # # print(list(results))
-                # for result in results:
-                #     print(result)
-                #     if result < lowest_eval:
-                #         lowest_eval = result
-                #         best_source = (col, row)
-                #         best_move = highlighted[x]
-                #     x += 1
 
                 for move in highlighted:
                     temp_board = board.copy_board()
@@ -126,8 +115,10 @@ class AI:
             else return lowest
 
         """
+        #if board in self.saved.keys():
+         #   return self.saved[board]
 
-        if depth == 0:
+        if not depth:
             return board.evaluate()
         # do stuff
         val = [-1, 1][white]  # val = 1 if white else -1
