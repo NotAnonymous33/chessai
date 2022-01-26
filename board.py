@@ -121,17 +121,17 @@ class Board:
             self.full = int(string[5])
 
             # setting castling
-            if string[3] == "-":
+            if string[2] == "-":
                 # no castling can happen
                 self.move_kings([PieceColor.White, PieceColor.Black])
             else:
                 # castling can happen
-                if string.upper() == string:  # lower case, white cannot castle
+                if string[2].upper() == string[2]:  # lower case, white cannot castle
                     self.move_kings([PieceColor.White])
-                elif string.lower() == string:  # upper case, black cannot castle
+                elif string[2].lower() == string[2]:  # upper case, black cannot castle
                     self.move_kings([PieceColor.Black])
                 else:
-                    pass
+                    pass  # axby something should go here
 
         self.source_coord = (-1, -1)
         self.moved_to = (-1, -1)
@@ -327,14 +327,17 @@ class Board:
             return
         if self.pieces[y][x].moved:
             return  # no castling allowed if king has moved
-        if not self.pieces[y][7].color.value:
-            return
 
-        if not self.pieces[y][7].moved and (
-                self.pieces[y][x + 1].color.value == self.pieces[y][x + 2].color.value == 0):
-            self.highlighted_cells.add((x + 2, y))
 
         if not self.pieces[y][7].moved and \
+                self.pieces[y][7].piece_type == PieceType.Rook and \
+                self.pieces[y][7].color.value == self.turn and \
+                (self.pieces[y][x + 1].color.value == self.pieces[y][x + 2].color.value == 0):
+            self.highlighted_cells.add((x + 2, y))
+
+        if not self.pieces[y][0].moved and \
+                self.pieces[y][0].piece_type == PieceType.Rook and \
+                self.pieces[y][0].color.value == self.turn and \
                 (self.pieces[y][x - 1].color.value ==
                  self.pieces[y][x - 2].color.value ==
                  self.pieces[y][x - 3].color.value == 0):
