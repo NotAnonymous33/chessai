@@ -89,6 +89,7 @@ class AI:
         board.move_piece(*best_move, True)
         if promoting:
             board.move_piece(*best_promoting_move, True)
+        board.reset_source()
 
     # def get_eval(self, move, board):
     #     temp_board = pickle.loads(pickle.dumps(board, -1))

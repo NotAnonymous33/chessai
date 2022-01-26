@@ -119,9 +119,6 @@ def main(depth):
 
                     if board.quit:
                         print("game double ended")
-                    elif board.ai and board.turn == -1:
-                        drawer.draw(board)
-                        board.ai_move()
                     if _quit.click(*pos) == 2:
                         option = 0
 
