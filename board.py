@@ -1,6 +1,8 @@
 from pieces import *
+from copy import copy
 import pickle
 import dis
+import gc
 
 pieces_order = [PieceType.Rook, PieceType.Knight, PieceType.Bishop, PieceType.Queen,
                 PieceType.King, PieceType.Bishop, PieceType.Knight, PieceType.Rook]
@@ -67,6 +69,7 @@ tables = {
                        PieceType.King: empty_table}
 }
 
+
 def to_fen(board):
     string = ""
     count = 0
@@ -90,6 +93,7 @@ def to_fen(board):
         string += "b"
 
     return string
+
 
 def fen_converter(string):
     pieces = []
@@ -117,6 +121,10 @@ def fen_converter(string):
 
 class Board:
     def __init__(self, depth=3, string=STRING):
+        if depth == -1:
+            self.white_king = self.black_king = self.turn = self.half = self.full = self.source_coord = self.moved_to = \
+                self.highlighted_cells = self.check = self.quit = self.promote = self.ai = self.pieces = None
+            return
         string = string.split()
         self.pieces = fen_converter(string[0])
         for y, row in enumerate(self.pieces):
@@ -162,13 +170,11 @@ class Board:
         self.promote = False
         self.ai = depth != 0
 
-
     def move_kings(self, colors):
         for row in self.pieces:
             for piece in row:
                 if piece.piece_type == PieceType.King and piece.color in colors:
                     piece.moved = True
-
 
     def click(self, xpos, ypos):
         xc = xpos // CLENGTH
@@ -206,7 +212,7 @@ class Board:
         with open("game.txt", "a") as file:
             file.write(to_fen(self) + "\n")
         with open("pgn.txt", "a") as file:
-            file.write(f"{self.full}.{self.pieces[yc][xc].image}{chr(xc+97)}{8-yc} ")
+            file.write(f"{self.full}.{self.pieces[yc][xc].image}{chr(xc + 97)}{8 - yc} ")
             self.full += 1
 
         if not self.promote:
@@ -349,7 +355,6 @@ class Board:
         if self.pieces[y][x].moved:
             return  # no castling allowed if king has moved
 
-
         if not self.pieces[y][7].moved and \
                 self.pieces[y][7].piece_type == PieceType.Rook and \
                 self.pieces[y][7].color.value == self.turn and \
@@ -378,7 +383,6 @@ class Board:
     def reset_source(self):
         self.source_coord = (-1, -1)
         self.highlighted_cells = set([])
-
 
     def move_piece(self, x, y, first=False):
         self.moved_to = (x, y)
@@ -446,9 +450,6 @@ class Board:
 
         if self.check and first:
             self.check_checkmate()
-            if self.quit:
-                print("end")
-                print(self.evaluate())
 
         '''
         If king is under attack, check
@@ -593,22 +594,24 @@ class Board:
         return e
 
     def copy_board(self):
-        # new_board = Board()
-        # new_board.white_king = self.white_king
-        # new_board.black_king = self.black_king
-        # new_board.turn = self.turn
-        # new_board.half = self.half
-        # new_board.full = self.full
-        #
-        # new_board.source_coord = self.source_coord
-        # new_board.moved_to = self.moved_to
-        # new_board.highlighted_cells = self.highlighted_cells.copy()
-        # new_board.check = self.check
-        # new_board.quit = self.quit
-        # new_board.promote = self.promote
-        # new_board.ai = self.ai
-        #
-        # new_board.pieces = [[piece.copy() for piece in row] for row in self.pieces]
-        # return new_board
+        new_board = copy(self)
+        new_board.pieces = [[piece.copy() for piece in row] for row in self.pieces]
+        return new_board
 
-        return pickle.loads(pickle.dumps(self, -1))
+        new_board = Board(depth=-1)
+        new_board.white_king = self.white_king
+        new_board.black_king = self.black_king
+        new_board.turn = self.turn
+        new_board.half = self.half
+        new_board.full = self.full
+        new_board.source_coord = self.source_coord
+        new_board.moved_to = self.moved_to
+        new_board.highlighted_cells = self.highlighted_cells.copy()
+        new_board.check = self.check
+        new_board.quit = self.quit
+        new_board.promote = self.promote
+        new_board.ai = self.ai
+
+        new_board.pieces = [[piece.copy() for piece in row] for row in self.pieces]
+        return new_board
+
