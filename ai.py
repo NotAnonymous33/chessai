@@ -1,5 +1,6 @@
 from constants import *
 from timer import timer
+from board import to_fen
 import concurrent.futures
 import dis
 
@@ -90,6 +91,12 @@ class AI:
         if promoting:
             board.move_piece(*best_promoting_move, True)
         board.reset_source()
+        with open("game.txt", "a") as file:
+            file.write(to_fen(board) + "\n")
+        x, y = best_move
+        with open("pgn.txt", "a") as file:
+            file.write(f"{board.pieces[y][x].image}{chr(x + 97)}{8 - y} ")
+
 
     # def get_eval(self, move, board):
     #     temp_board = pickle.loads(pickle.dumps(board, -1))

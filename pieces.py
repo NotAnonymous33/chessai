@@ -30,6 +30,7 @@ class Piece:
             self.moved = False
             self.color = PieceColor.Empty
             self.piece_type = PieceType.Empty
+            self.image = ""
             return
 
         if string.isupper():
@@ -40,6 +41,7 @@ class Piece:
         self.piece_type = pieces_dict[string.lower()]
         self.moved = moved
         self.image = string
+
 
         if self.piece_type == PieceType.Pawn:
             if self.color == PieceColor.White and y != 6 or self.color == PieceColor.Black and y != 1:

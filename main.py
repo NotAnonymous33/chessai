@@ -26,12 +26,14 @@ def fen_check(string):
     string = string.split()
     if len(string) == 1 and string[0].count("/") == 7:
         return True
-    if len(string) != 6:
+    if len(string) != 6 and len(string) != 2:
         return False
     if string[0].count("/") != 7:
         return False
     if string[1] != "w" and string[1] != "b":
         return False
+    if len(string) == 2:
+        return True
     if set(string[2]).difference(set("KQkq-")) != set([]):
         return False
     if not string[4].isdigit():
@@ -70,6 +72,13 @@ def main(depth):
         Button(400, 200, 50, 50, 5, "+")  # increase depth
     ]
 
+    end = Button(100, 100, 450, 100, 9, "")
+
+    with open("game.txt", "w"):
+        pass
+    with open("pgn.txt", "w"):
+        pass
+
     # game loop
     # 0 ... Menu
     # 1 ... Game
@@ -79,6 +88,8 @@ def main(depth):
     # 5 ... +1 depth
     # 6 ... New game vs player
     # 7 ... new game vs ai with fen
+    # 8 ... new game vs player with fen
+    # 9 ... end of game
 
     while running:
         # Menu
@@ -107,8 +118,12 @@ def main(depth):
             if board is None:
                 option = 0
                 continue
-            if board.turn == -1 and board.ai:
+            if board.quit:
+                if board.check:
+                    end.text = "Game has ended"
+            elif board.turn == -1 and board.ai:
                 ai.move(board)
+
             for event in pygame.event.get():
                 pos = pygame.mouse.get_pos()
                 if event.type == pygame.QUIT:
@@ -117,14 +132,14 @@ def main(depth):
                 if event.type == pygame.MOUSEBUTTONUP:
                     board.click(*pos)
 
-                    if board.quit:
-                        print("game double ended")
                     if _quit.click(*pos) == 2:
                         option = 0
 
                 _quit.check_hover(*pos)
 
             drawer.draw(board)
+            if board.quit:
+                end.draw()
             _quit.draw()
 
         # New game

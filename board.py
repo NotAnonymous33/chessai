@@ -1,5 +1,4 @@
 from pieces import *
-from ai import AI
 import pickle
 import dis
 
@@ -68,6 +67,29 @@ tables = {
                        PieceType.King: empty_table}
 }
 
+def to_fen(board):
+    string = ""
+    count = 0
+    for row in board.pieces:
+        for piece in row:
+            if piece.image == "":
+                count += 1
+            else:
+                if count != 0:
+                    string += str(count)
+                    count = 0
+                string += piece.image
+        if count != 0:
+            string += str(count)
+            count = 0
+        string += "/"
+    string = string[:-1] + " "
+    if board.turn == 1:
+        string += "w"
+    else:
+        string += "b"
+
+    return string
 
 def fen_converter(string):
     pieces = []
@@ -95,7 +117,6 @@ def fen_converter(string):
 
 class Board:
     def __init__(self, depth=3, string=STRING):
-        print(dis.dis(self.evaluate))
         string = string.split()
         self.pieces = fen_converter(string[0])
         for y, row in enumerate(self.pieces):
@@ -113,7 +134,7 @@ class Board:
             self.turn = -1
 
         # setting clocks
-        if len(string) == 1:
+        if len(string) == 1 or len(string) == 2:
             self.half = 0
             self.full = 0
         else:
@@ -139,11 +160,7 @@ class Board:
         self.check = False
         self.quit = False
         self.promote = False
-        if depth == 0:
-            self.ai = None
-        else:
-            self.ai = True
-
+        self.ai = depth != 0
 
 
     def move_kings(self, colors):
@@ -163,13 +180,6 @@ class Board:
             return
 
         x, y = self.source_coord
-        if y % 7 == 0 and self.pieces[y][x].piece_type == PieceType.Pawn:
-            self.highlight_cells(True)
-            self.move_piece(xc, yc, True)
-            # print(f"{self.turn=}")
-            self.reset_source()
-            return
-
         # if there isn't a source cell
         if self.source_coord == (-1, -1):
             if self.pieces[yc][xc].color.value is self.turn:  # if a cell with a piece is clicked
@@ -184,9 +194,20 @@ class Board:
                 self.reset_source()
             return
 
-        # there is a source cell
+        if y % 7 == 0 and self.pieces[y][x].piece_type == PieceType.Pawn:
+            self.highlight_cells(True)
+            self.move_piece(xc, yc, True)
+            # print(f"{self.turn=}")
+            # self.reset_source()
+
         if not self.promote and (xc, yc) in self.highlighted_cells:
             self.move_piece(xc, yc, True)
+
+        with open("game.txt", "a") as file:
+            file.write(to_fen(self) + "\n")
+        with open("pgn.txt", "a") as file:
+            file.write(f"{self.full}.{self.pieces[yc][xc].image}{chr(xc+97)}{8-yc} ")
+            self.full += 1
 
         if not self.promote:
             self.reset_source()
@@ -357,7 +378,7 @@ class Board:
     def reset_source(self):
         self.source_coord = (-1, -1)
         self.highlighted_cells = set([])
-        # self.promote = False
+
 
     def move_piece(self, x, y, first=False):
         self.moved_to = (x, y)
@@ -572,4 +593,22 @@ class Board:
         return e
 
     def copy_board(self):
+        # new_board = Board()
+        # new_board.white_king = self.white_king
+        # new_board.black_king = self.black_king
+        # new_board.turn = self.turn
+        # new_board.half = self.half
+        # new_board.full = self.full
+        #
+        # new_board.source_coord = self.source_coord
+        # new_board.moved_to = self.moved_to
+        # new_board.highlighted_cells = self.highlighted_cells.copy()
+        # new_board.check = self.check
+        # new_board.quit = self.quit
+        # new_board.promote = self.promote
+        # new_board.ai = self.ai
+        #
+        # new_board.pieces = [[piece.copy() for piece in row] for row in self.pieces]
+        # return new_board
+
         return pickle.loads(pickle.dumps(self, -1))
