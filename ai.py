@@ -87,6 +87,10 @@ class AI:
 
         print(lowest_eval)
         board.source_coord = best_source
+        if best_move is None:
+            board.quit = True
+            board.reset_source()
+            return
         board.move_piece(*best_move, True)
         if promoting:
             board.move_piece(*best_promoting_move, True)

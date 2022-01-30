@@ -18,7 +18,7 @@ from ai import AI
 # 1nb1kb1r/2p1rppp/p4n2/1p6/2pqPB2/2N2BQ1/PP3PPP/R3R1K1 testing is_check speed improvement
 # 8/1RP5/N1P5/1b2P3/k2Br3/4Pp1K/5p1b/5N2 w - - 0 1 new bug
 # 3kq3/8/8/8/8/8/8/3K4 check
-# 1k4r1/5r2/8/8/7K/8/8/8 checkmate
+# 1k4r1/5r2/8/8/7K/8/8/8 checkmate - ai wins
 # 6k1/5p2/6p1/8/7p/8/6PP/7K w - - 0 1 testing
 # 8/8/8/5RB1/2pk1K2/3r4/8/8 - checkmate testing
 
@@ -72,7 +72,7 @@ def main(depth):
         Button(400, 200, 50, 50, 5, "+")  # increase depth
     ]
 
-    end = Button(100, 100, 450, 100, 9, "")
+    end = Button(100, 100, 450, 50, 9, "")
 
     with open("game.txt", "w"):
         pass
@@ -119,8 +119,15 @@ def main(depth):
                 option = 0
                 continue
             if board.quit:
+                end.text = "Game has ended"
                 if board.check:
-                    end.text = "Game has ended"
+                    if board.turn == -1:
+                        end.text += ". White has won"
+                    else:
+                        end.text += ". Black has won"
+                else:
+                    end.text += " in stalemate"
+
             elif board.turn == -1 and board.ai:
                 ai.move(board)
 
