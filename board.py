@@ -3,6 +3,7 @@ from copy import copy
 import pickle
 import dis
 import gc
+import numpy as np
 
 pieces_order = [PieceType.Rook, PieceType.Knight, PieceType.Bishop, PieceType.Queen,
                 PieceType.King, PieceType.Bishop, PieceType.Knight, PieceType.Rook]
@@ -121,6 +122,7 @@ def fen_converter(string):
 
 class Board:
     def __init__(self, depth=3, string=STRING):
+        print(dis.dis(self.line_check))
         if depth == -1:
             self.white_king = self.black_king = self.turn = self.half = self.full = self.source_coord = self.moved_to = \
                 self.highlighted_cells = self.check = self.quit = self.promote = self.ai = self.pieces = None
@@ -479,7 +481,7 @@ class Board:
         self.quit = True
 
     def knight_check(self, prev, direction):
-        self.source_coord = tuple(map(sum, zip(prev, direction)))
+        self.source_coord = tuple(np.add(prev, direction))
         if all(list(map(lambda z: 0 <= z <= 7, self.source_coord))):
             sx, sy = self.source_coord
             piece = self.pieces[sy][sx]
@@ -488,8 +490,8 @@ class Board:
         return False
 
     def line_check(self, king, prev, direction):
-        self.source_coord = tuple(map(sum, zip(prev, direction)))
-        while all(list(map(lambda z: 0 <= z <= 7, self.source_coord))):
+        self.source_coord = tuple(np.add(prev, direction))
+        while 0 <= self.source_coord[0] <= 7 and 0 <= self.source_coord[1] <= 7:
             cx, cy = self.source_coord
             if self.pieces[cy][cx].color.value == self.turn * -1:
                 return False
@@ -497,7 +499,7 @@ class Board:
                 self.highlight_cells()
                 if king in self.highlighted_cells:
                     return True
-            self.source_coord = tuple(map(sum, zip(self.source_coord, direction)))
+            self.source_coord = tuple(np.add(self.source_coord, direction))
         return False
 
     def is_check(self, prev=None, current=None):
