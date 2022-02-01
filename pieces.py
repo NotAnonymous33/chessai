@@ -24,7 +24,15 @@ pieces_dict = {"r": PieceType.Rook, "n": PieceType.Knight, "b": PieceType.Bishop
 
 
 class Piece:
-    def __init__(self, string="", moved=False, x=-1, y=-1):
+    def __init__(self, string="", moved=False, x=-1, y=-1, piece=None):
+        if piece is not None:
+            self.moved = piece.moved
+            self.color = piece.color
+            self.piece_type = piece.piece_type
+            self.image = piece.image
+            return
+
+
         # for blank pieces
         if string == "":
             self.moved = False
@@ -55,11 +63,7 @@ class Piece:
                     self.moved = True
 
     def copy(self):
-        new_piece = Piece()
-        new_piece.move = self.moved
-        new_piece.color = self.color
-        new_piece.piece_type = self.piece_type
-        new_piece.image = self.image
+        new_piece = Piece(piece=self)
         return new_piece
 
     def __repr__(self):
