@@ -4,13 +4,14 @@ from board import to_fen
 import concurrent.futures
 import dis
 
+
 # https://stackoverflow.com/questions/6785226/pass-multiple-parameters-to-concurrent-futures-executor-map
 
 
 class AI:
     def __init__(self, depth):
         self.depth = depth - 1
-
+        print(dis.dis(self.minimax))
 
     @timer
     def move(self, board):
@@ -101,7 +102,6 @@ class AI:
         with open("pgn.txt", "a") as file:
             file.write(f"{board.pieces[y][x].image}{chr(x + 97)}{8 - y} ")
 
-
     # def get_eval(self, move, board):
     #     temp_board = pickle.loads(pickle.dumps(board, -1))
     #     temp_board.move_piece(*move)
@@ -127,8 +127,6 @@ class AI:
             else return lowest
 
         """
-        #if board in self.saved.keys():
-         #   return self.saved[board]
 
         if not depth:
             return board.evaluate()
@@ -154,8 +152,8 @@ class AI:
                                     promoting_temp_board = temp_board.copy_board()
                                     promoting_temp_board.move_piece(*promoting_move, True)
                                     promoting_eval = self.minimax(promoting_temp_board, 1, white, alpha, beta)
-                                    if promoting_eval > highest_promoting_eval:
-                                        highest_promoting_eval = promoting_eval
+
+                                    highest_promoting_eval = max(promoting_eval, highest_promoting_eval)
                                 eval = highest_promoting_eval
                             elif temp_board.quit:
                                 eval = temp_board.evaluate()
@@ -186,8 +184,7 @@ class AI:
                                 promoting_temp_board = temp_board.copy_board()
                                 promoting_temp_board.move_piece(*promoting_move, True)
                                 promoting_eval = self.minimax(promoting_temp_board, 1, white, alpha, beta)
-                                if promoting_eval < lowest_promoting_eval:
-                                    lowest_promoting_eval = promoting_eval
+                                lowest_promoting_eval = min(promoting_eval, lowest_promoting_eval)
                             eval = lowest_promoting_eval
                         elif temp_board.quit:
                             eval = temp_board.evaluate()
@@ -198,23 +195,3 @@ class AI:
                         if beta <= alpha:
                             return min_eval
         return min_eval
-
-        # # https://www.youtube.com/watch?v=l-hh51ncgDI
-        # # depth is not 0
-        # evals = []
-        # for rowy in range(NUM_ROWS):
-        #     for colx in range(NUM_ROWS):
-        #         if board.pieces[rowy][colx].color.value == val:
-        #             board.reset_source()
-        #             board.source_coord = (colx, rowy)
-        #             board.highlight_cells(True)
-        #
-        #             for move in board.highlighted_cells:
-        #                 temp_board = board.copy_board()
-        #                 temp_board.move_piece(*move, True)
-        #                 evals.append(self.minimax(temp_board, depth - 1, not white))
-        # if not len(evals):
-        #     return 0
-        # if white:
-        #     return max(evals)
-        # return min(evals)

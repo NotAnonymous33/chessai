@@ -56,13 +56,15 @@ def main(depth):
     running = True
     option = 0
 
+    fen_buttons = [
+        Button(450, 200, 100, 50, 7, "FEN from clipboard"),  # FEN AI button
+        Button(450, 500, 100, 50, 8, "FEN")  # FEN player button
+    ]
     buttons = [
         Button(100, 200, 300, 50, 1, "New Game vs AI"),  # new game button
         Button(100, 300, 300, 50, 3, "Continue Game"),  # continue game button
         Button(100, 400, 300, 50, 4, "Settings"),  # continue game button
         Button(100, 500, 300, 50, 6, "New Game vs Player"),  # continue game button
-        Button(450, 200, 100, 50, 7, "FEN from clipboard"),  # FEN AI button
-        Button(450, 500, 100, 50, 8, "FEN")  # FEN player button
     ]
 
     _quit = Button(525, 600, 75, 75, 2, "Quit")  # quit button
@@ -104,13 +106,23 @@ def main(depth):
                     running = False
                 elif event.type == pygame.MOUSEBUTTONUP:
                     vals = [button.click(*pos) for button in buttons]
+                    vals += [button.click(*pos) for button in fen_buttons]
                     if (x := max(vals)) >= 0:
                         option = x
 
                 for button in buttons:
                     button.check_hover(*pos)
+                for button in fen_buttons:
+                    button.check_hover(*pos)
+                    if button.is_hover:
+                        if fen_check(pyperclip.paste()):
+                            button.color = (0, 255, 0)
+                        else:
+                            button.color = (255, 0, 0)
 
             for button in buttons:
+                button.draw()
+            for button in fen_buttons:
                 button.draw()
 
         # continue Game

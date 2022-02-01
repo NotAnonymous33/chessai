@@ -13,6 +13,7 @@ class Button:
         self.color = BCOLOR
         self.return_value = ret
         self.text = text
+        self.is_hover = False
 
     def draw(self):
         pygame.draw.rect(WIN, self.color, [self.x, self.y, self.width, self.height])
@@ -21,8 +22,10 @@ class Button:
     def check_hover(self, x, y):
         if self.x < x < self.x + self.width and self.y < y < self.y + self.height:
             self.color = BCOLOR2
+            self.is_hover = True
         else:
             self.color = BCOLOR
+            self.is_hover = False
 
     def click(self, x, y):
         if self.x < x < self.x + self.width and self.y < y < self.y + self.height:

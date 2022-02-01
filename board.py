@@ -70,7 +70,6 @@ tables = {
                        PieceType.King: empty_table}
 }
 
-
 def to_fen(board):
     string = ""
     count = 0
@@ -214,7 +213,12 @@ class Board:
         with open("game.txt", "a") as file:
             file.write(to_fen(self) + "\n")
         with open("pgn.txt", "a") as file:
-            file.write(f"{self.full}.{self.pieces[yc][xc].image}{chr(xc + 97)}{8 - yc} ")
+
+            if yc == 8:
+                line = ""
+            else:
+                line = f"{self.full}.{self.pieces[yc][xc].image}{chr(xc + 97)}{8 - yc} "
+            file.write(line)
             self.full += 1
 
         if not self.promote:
@@ -599,21 +603,3 @@ class Board:
         new_board = copy(self)
         new_board.pieces = [[piece.copy() for piece in row] for row in self.pieces]
         return new_board
-
-        new_board = Board(depth=-1)
-        new_board.white_king = self.white_king
-        new_board.black_king = self.black_king
-        new_board.turn = self.turn
-        new_board.half = self.half
-        new_board.full = self.full
-        new_board.source_coord = self.source_coord
-        new_board.moved_to = self.moved_to
-        new_board.highlighted_cells = self.highlighted_cells.copy()
-        new_board.check = self.check
-        new_board.quit = self.quit
-        new_board.promote = self.promote
-        new_board.ai = self.ai
-
-        new_board.pieces = [[piece.copy() for piece in row] for row in self.pieces]
-        return new_board
-
