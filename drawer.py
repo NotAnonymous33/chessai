@@ -33,7 +33,7 @@ def draw_pieces(board):
 
 def draw_promoting():
     for i, p in enumerate(["rook", "knight", "bishop", "queen"]):
-        WIN.blit(NIMAGES[p], (i * CLENGTH, 8 * CLENGTH))
+        WIN.blit(NIMAGES[p], (i * CLENGTH, NUM_ROWS * CLENGTH))
 
 
 def draw(board):
@@ -48,7 +48,7 @@ def draw(board):
             cell.draw()
 
     # draw moved to square
-    pygame.draw.rect(WIN, (255, 0, 0),
+    pygame.draw.rect(WIN, MTCOLOR,
                      [board.moved_to[0] * CLENGTH, board.moved_to[1] * CLENGTH, CLENGTH, CLENGTH])
 
     # draw highlighted squares

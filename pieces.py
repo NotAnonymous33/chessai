@@ -32,7 +32,6 @@ class Piece:
             self.image = piece.image
             return
 
-
         # for blank pieces
         if string == "":
             self.moved = False

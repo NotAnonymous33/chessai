@@ -11,7 +11,6 @@ import dis
 class AI:
     def __init__(self, depth):
         self.depth = depth - 1
-        print(dis.dis(self.minimax))
 
     @timer
     def move(self, board):

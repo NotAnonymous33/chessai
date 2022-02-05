@@ -4,6 +4,7 @@ from button import Button
 from constants import *
 import pyperclip
 from ai import AI
+import json
 
 
 # 3k4/8/8/8/8/4R3/1K5p/8 testing AI promoting
@@ -45,7 +46,10 @@ def fen_check(string):
 
 
 
-def main(depth):
+def main():
+    with open("settings.json", "r") as read_file:
+        data = json.load(read_file)
+        depth = data["depth"]
     clock = pygame.time.Clock()
     pygame.display.set_caption("Chess by Ismail Choudhury")
     title = pygame.font.SysFont("Comic Sans MS", 70)
@@ -219,6 +223,6 @@ def main(depth):
 
 
 if __name__ == "__main__":
-    main(DEPTH)
+    main()
 
 pygame.quit()

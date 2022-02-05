@@ -121,7 +121,6 @@ def fen_converter(string):
 
 class Board:
     def __init__(self, depth=3, string=STRING):
-        print(dis.dis(self.line_check))
         if depth == -1:
             self.white_king = self.black_king = self.turn = self.half = self.full = self.source_coord = self.moved_to = \
                 self.highlighted_cells = self.check = self.quit = self.promote = self.ai = self.pieces = None
@@ -494,7 +493,8 @@ class Board:
         return False
 
     def line_check(self, king, prev, direction):
-        self.source_coord = tuple(np.add(prev, direction))
+        self.source_coord = np.add(prev, direction)
+        self.source_coord = np.add(prev, direction)
         while 0 <= self.source_coord[0] <= 7 and 0 <= self.source_coord[1] <= 7:
             cx, cy = self.source_coord
             if self.pieces[cy][cx].color.value == self.turn * -1:
@@ -503,7 +503,7 @@ class Board:
                 self.highlight_cells()
                 if king in self.highlighted_cells:
                     return True
-            self.source_coord = tuple(np.add(self.source_coord, direction))
+            self.source_coord = np.add(self.source_coord, direction)
         return False
 
     def is_check(self, prev=None, current=None):
@@ -601,5 +601,5 @@ class Board:
 
     def copy_board(self):
         new_board = copy(self)
-        new_board.pieces = [[piece.copy() for piece in row] for row in self.pieces]
+        new_board.pieces = [[Piece(piece=piece) for piece in row] for row in self.pieces]
         return new_board
