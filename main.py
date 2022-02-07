@@ -1,5 +1,5 @@
 from board import Board
-import drawer
+from drawer import Drawer
 from button import Button
 from constants import *
 import pyperclip
@@ -44,12 +44,25 @@ def fen_check(string):
     return True
 
 
-
-
 def main():
+    import pygame
+    pygame.init()
     with open("settings.json", "r") as read_file:
         data = json.load(read_file)
-        depth = data["depth"]
+    depth = data["depth"]
+    fps = data["fps"]
+    win = pygame.display.set_mode((TLENGTH, TLENGTH + CLENGTH))
+    font = pygame.font.SysFont("Comic Sans MS", 30)
+
+    _PNAMES = ["b", "k", "n", "p", "q", "r"]
+    images = {i: pygame.transform.scale(pygame.image.load("images/black/" + i + ".png"), (CLENGTH, CLENGTH)) for i in
+              _PNAMES}
+    images.update(
+        {i.upper(): pygame.transform.scale(pygame.image.load("images/white/" + i.upper() + ".png"), (CLENGTH, CLENGTH))
+         for i in _PNAMES})
+    ba = ["rook", "knight", "bishop", "queen"]
+    NIMAGES = {i: pygame.transform.scale(pygame.image.load("images/" + i + ".png"), (CLENGTH, CLENGTH)) for i in ba}
+    drawer = Drawer(win, data, font, pygame, images)
     clock = pygame.time.Clock()
     pygame.display.set_caption("Chess by Ismail Choudhury")
     title = pygame.font.SysFont("Comic Sans MS", 70)
@@ -100,9 +113,9 @@ def main():
     while running:
         # Menu
         if option == 0:
-            WIN.fill(MCOLOR)
+            win.fill(MCOLOR)
             text = title.render("Chess", True, (0, 0, 0))
-            WIN.blit(text, (TLENGTH // 2 - 100, 100))
+            win.blit(text, (TLENGTH // 2 - 100, 100))
 
             for event in pygame.event.get():
                 pos = pygame.mouse.get_pos()
@@ -125,9 +138,9 @@ def main():
                             button.color = (255, 0, 0)
 
             for button in buttons:
-                button.draw()
+                drawer.draw_button(button)
             for button in fen_buttons:
-                button.draw()
+                drawer.draw_button(button)
 
         # continue Game
         elif option == 3:
@@ -162,8 +175,8 @@ def main():
 
             drawer.draw(board)
             if board.quit:
-                end.draw()
-            _quit.draw()
+                drawer.draw_button(end)
+            drawer.draw_button(_quit)
 
         # New game
         elif option == 1 or option == 6 or option == 7 or option == 8:
@@ -189,11 +202,11 @@ def main():
 
         # Settings
         elif option == 4:
-            WIN.fill(MCOLOR)
+            win.fill(MCOLOR)
             text = title.render("Settings", True, (0, 0, 0))
-            WIN.blit(text, (TLENGTH // 2 - 150, 100))
+            win.blit(text, (TLENGTH // 2 - 150, 100))
             depth_text = normal.render(f"{depth = }", True, (0, 0, 0))
-            WIN.blit(depth_text, (100, 200))
+            win.blit(depth_text, (100, 200))
 
             for event in pygame.event.get():
                 pos = pygame.mouse.get_pos()
@@ -215,14 +228,18 @@ def main():
                 _quit.check_hover(*pos)
 
             for button in settings:
-                button.draw()
-            _quit.draw()
+                drawer.draw(button)
+            drawer.draw(_quit)
 
         pygame.display.flip()
-        clock.tick(FPS)
+        clock.tick(fps)
+
+    data["depth"] = depth
+    with open("settings.json", "w") as file:
+        json.dump(data, file)
+    pygame.quit()
 
 
 if __name__ == "__main__":
     main()
 
-pygame.quit()

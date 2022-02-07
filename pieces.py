@@ -87,9 +87,6 @@ class Cell:
         self.ycoor = y * CLENGTH
         self.color = [LCOLOR, RCOLOR][(x + y) % 2]
 
-    def draw(self):
-        pygame.draw.rect(WIN, self.color, [self.xcoor, self.ycoor, CLENGTH, CLENGTH])
-
     def __repr__(self):
         return f"({self.xcoor}, {self.ycoor})"
 

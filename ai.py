@@ -1,7 +1,7 @@
 from constants import *
 from timer import timer
 from board import to_fen
-import concurrent.futures
+import multiprocessing as mp
 import dis
 
 
@@ -40,12 +40,14 @@ class AI:
         best_source = (0, 0)
         lowest_eval = 99999999
         best_move = None
-        promoting = False
+        best_promoting_move = (-1, -1)
+        boards = []
+        # pool = mp.Pool()
         for row in range(NUM_ROWS)[::-1]:
             for col in range(NUM_ROWS)[::-1]:
-                print(col, row)
                 if board.pieces[row][col].color.value != -1:
                     continue
+                print(col, row)
                 board.reset_source()
                 board.source_coord = (col, row)
                 board.highlight_cells(True)
@@ -59,31 +61,25 @@ class AI:
                     temp_board = board.copy_board()
                     temp_board.move_piece(*move, True)
 
-                    # if promoting then need to add some stuff here
-                    # make sure to do that
-                    # causes big unexpected problems
-                    # took a while to figure out this was the source of those problems
                     if temp_board.promote:
                         for promoting_move in temp_board.highlighted_cells:
                             promoting_temp_board = temp_board.copy_board()
                             promoting_temp_board.move_piece(*promoting_move, True)
-                            promoting_eval = self.minimax(promoting_temp_board, self.depth, True)
+                            promoting_eval = self.minimax(promoting_temp_board)
                             if promoting_eval < lowest_eval:
                                 lowest_eval = promoting_eval
                                 best_source = (col, row)
                                 best_move = move
-                                promoting = True
                                 best_promoting_move = promoting_move
-
-                    # add for if pawn y = 0
-                    # add castling
                     else:
-                        evaluation = self.minimax(temp_board, self.depth, True)
+                        # axby add processes here, add next for loop
+                        boards.append(temp_board)
+                        evaluation = self.minimax(temp_board)
                         if evaluation < lowest_eval:
                             lowest_eval = evaluation
                             best_source = (col, row)
                             best_move = move
-                            promoting = False
+                            best_promoting_move = (-1, -1)
 
         print(lowest_eval)
         board.source_coord = best_source
@@ -92,7 +88,7 @@ class AI:
             board.reset_source()
             return
         board.move_piece(*best_move, True)
-        if promoting:
+        if best_promoting_move != (-1, -1):
             board.move_piece(*best_promoting_move, True)
         board.reset_source()
         with open("game.txt", "a") as file:
@@ -101,14 +97,9 @@ class AI:
         with open("pgn.txt", "a") as file:
             file.write(f"{board.pieces[y][x].image}{chr(x + 97)}{8 - y} ")
 
-    # def get_eval(self, move, board):
-    #     temp_board = pickle.loads(pickle.dumps(board, -1))
-    #     temp_board.move_piece(*move)
-    #     return self.minimax(temp_board, self.depth, True)
-
     # @cache
     # @lru_cache(maxsize=None)
-    def minimax(self, board, depth, white, alpha=-99999999, beta=99999999) -> int:
+    def minimax(self, board, depth=None, white=True, alpha=-99999999, beta=99999999) -> int:
         """
         white value = 1
         black value = 0
@@ -126,7 +117,8 @@ class AI:
             else return lowest
 
         """
-
+        if depth is None:
+            depth = self.depth
         if not depth:
             return board.evaluate()
         # do stuff
