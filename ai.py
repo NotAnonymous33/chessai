@@ -42,7 +42,6 @@ class AI:
         best_move = None
         best_promoting_move = (-1, -1)
         boards = []
-        # pool = mp.Pool()
         for row in range(NUM_ROWS)[::-1]:
             for col in range(NUM_ROWS)[::-1]:
                 if board.pieces[row][col].color.value != -1:
@@ -74,14 +73,21 @@ class AI:
                     else:
                         # axby add processes here, add next for loop
                         boards.append(temp_board)
-                        evaluation = self.minimax(temp_board)
-                        if evaluation < lowest_eval:
-                            lowest_eval = evaluation
-                            best_source = (col, row)
-                            best_move = move
-                            best_promoting_move = (-1, -1)
+                        # evaluation = self.minimax(temp_board)
+                        # if evaluation < lowest_eval:
+                        #     lowest_eval = evaluation
+                        #     best_source = (col, row)
+                        #     best_move = move
+                        #     best_promoting_move = (-1, -1)
+        pool = mp.Pool()
+        data = pool.map(self.minimax, boards)
+        pool.close()
+        boards = dict(zip(boards, data))
+        best_board = min(boards, key=boards.get)
+        print(boards[best_board])
+        best_source = best_board.source_coord
+        best_move = best_board.moved_to
 
-        print(lowest_eval)
         board.source_coord = best_source
         if best_move is None:
             board.quit = True

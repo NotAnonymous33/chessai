@@ -582,7 +582,6 @@ class Board:
         # check down left
         if self.line_check(king, prev, (-1, 1)):
             return True
-
         return False
 
     # @lru_cache(maxsize=None)

@@ -61,8 +61,8 @@ def main():
         {i.upper(): pygame.transform.scale(pygame.image.load("images/white/" + i.upper() + ".png"), (CLENGTH, CLENGTH))
          for i in _PNAMES})
     ba = ["rook", "knight", "bishop", "queen"]
-    NIMAGES = {i: pygame.transform.scale(pygame.image.load("images/" + i + ".png"), (CLENGTH, CLENGTH)) for i in ba}
-    drawer = Drawer(win, data, font, pygame, images)
+    nimages = {i: pygame.transform.scale(pygame.image.load("images/" + i + ".png"), (CLENGTH, CLENGTH)) for i in ba}
+    drawer = Drawer(win, data, font, pygame, images, nimages)
     clock = pygame.time.Clock()
     pygame.display.set_caption("Chess by Ismail Choudhury")
     title = pygame.font.SysFont("Comic Sans MS", 70)
@@ -228,8 +228,8 @@ def main():
                 _quit.check_hover(*pos)
 
             for button in settings:
-                drawer.draw(button)
-            drawer.draw(_quit)
+                drawer.draw_button(button)
+            drawer.draw_button(_quit)
 
         pygame.display.flip()
         clock.tick(fps)

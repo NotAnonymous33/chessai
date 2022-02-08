@@ -5,11 +5,12 @@ cells = [[Cell(col, row) for col in range(NUM_ROWS)] for row in range(NUM_ROWS)]
 
 
 class Drawer:
-    def __init__(self, win, data, font, pygame, images):
+    def __init__(self, win, data, font, pygame, images, nimages):
         self.win = win
         self.pygame = pygame
         self.font = font
         self.images = images
+        self.nimages = nimages
 
     def draw_piece(self, piece, x, y):
         if not piece.color.value:
@@ -37,7 +38,7 @@ class Drawer:
 
     def draw_promoting(self):
         for i, p in enumerate(["rook", "knight", "bishop", "queen"]):
-            self.win.blit(NIMAGES[p], (i * CLENGTH, NUM_ROWS * CLENGTH))
+            self.win.blit(self.nimages[p], (i * CLENGTH, NUM_ROWS * CLENGTH))
 
     def draw(self, board):
         # draw the squares of the board
