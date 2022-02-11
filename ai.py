@@ -84,6 +84,7 @@ class AI:
         pool.close()
         boards = dict(zip(boards, data))
         best_board = min(boards, key=boards.get)
+        best_board = best_board
         print(boards[best_board])
         best_source = best_board.source_coord
         best_move = best_board.moved_to

@@ -455,6 +455,7 @@ class Board:
 
         if self.check and first:
             self.check_checkmate()
+            self.source_coord = current
 
         '''
         If king is under attack, check
@@ -541,10 +542,6 @@ class Board:
                 return True
             if self.knight_check(prev, (-1, -2)):
                 return True
-
-        # check for discovered check - knights and pawns can only put in check after being moved
-        # add only checking straights for rook and queen / diagonals for bishop and queen
-        # could change is not to self.turn*-1
 
         px, py = prev
         # check column
