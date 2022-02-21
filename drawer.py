@@ -1,8 +1,6 @@
 from pieces import Cell
 from constants import *
 
-cells = [[Cell(col, row) for col in range(NUM_ROWS)] for row in range(NUM_ROWS)]
-
 
 class Drawer:
     def __init__(self, win, data, font, pygame, images, nimages):
@@ -11,6 +9,11 @@ class Drawer:
         self.font = font
         self.images = images
         self.nimages = nimages
+        self.lcolor = data["lcolor"]
+        self.rcolor = data["rcolor"]
+        self.highlighted_left = data["hlcolor"]
+        self.highlighted_right = data["hrcolor"]
+        self.cells = [[Cell(col, row, self.lcolor, self.rcolor) for col in range(NUM_ROWS)] for row in range(NUM_ROWS)]
 
     def draw_piece(self, piece, x, y):
         if not piece.color.value:
@@ -20,15 +23,15 @@ class Drawer:
         self.win.blit(img, (x * CLENGTH, y * CLENGTH))
 
     def draw_cells(self):
-        for row in cells:
+        for row in self.cells:
             for cell in row:
                 self.pygame.draw.rect(self.win, cell.color, [cell.xcoor, cell.ycoor, CLENGTH, CLENGTH])
 
     def draw_highlighted(self, board):
         for coord in board.highlighted_cells:
-            color = HLCOLOR
+            color = self.highlighted_left
             if (coord[0] + coord[1]) % 2:
-                color = HDCOLOR
+                color = self.highlighted_right
             self.pygame.draw.rect(self.win, color, [coord[0] * CLENGTH, coord[1] * CLENGTH, CLENGTH, CLENGTH])
 
     def draw_pieces(self, board):
@@ -48,7 +51,7 @@ class Drawer:
 
         if board.promote:
             for i in range(4):
-                cell = Cell(i, 8)
+                cell = Cell(i, 8, self.lcolor, self.rcolor)
                 self.pygame.draw.rect(self.win, cell.color, [cell.xcoor, cell.ycoor, CLENGTH, CLENGTH])
 
         # draw moved to square

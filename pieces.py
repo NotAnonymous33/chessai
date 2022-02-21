@@ -68,43 +68,13 @@ class Piece:
     def __repr__(self):
         return f"{self.color} {self.piece_type} {self.moved=}"
 
-    """
-    def copyp(self):
-        if not self.color.value:
-            piece = Piece()
-            return piece
-        new = Piece(0, 0)
-        new.color = self.color
-        new.piece_type = self.piece_type
-        new.moved = self.moved
-        return new
-    """
-
 
 class Cell:
-    def __init__(self, x, y):
+    def __init__(self, x, y, lcolor, rcolor):
         self.xcoor = x * CLENGTH
         self.ycoor = y * CLENGTH
-        self.color = [LCOLOR, RCOLOR][(x + y) % 2]
+        self.color = [lcolor, rcolor][(x + y) % 2]
 
     def __repr__(self):
         return f"({self.xcoor}, {self.ycoor})"
 
-
-"""
-class Empty:
-    def __init__(self):
-        self.color = PieceColor.Empty
-        self.piece_type = PieceType.Empty
-
-    def __repr__(self):
-        return "empty"
-
-    def draw(self, *args, **kwargs):
-        pass
-
-    def copyp(self):
-        new = Empty()
-        return new
-
-"""

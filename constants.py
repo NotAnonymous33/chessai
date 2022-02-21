@@ -1,18 +1,8 @@
 STRING = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"
-# STRING = "rnbqkbnr/pp1ppppp/8/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R b KQkq - 1 2"
-LCOLOR = (240, 230, 220)
-RCOLOR = (199, 117, 61)
-MCOLOR = (220, 173, 140)
-MTCOLOR = (255, 0, 0)
-SCOLOR = (0, 255, 255)
-HDCOLOR = (0, 181, 98)  # (127, 255, 0)
-HLCOLOR = (0, 255, 150)
+
+MTCOLOR = (255, 0, 0)  # moved to cell color
+SCOLOR = (0, 255, 255)  # selected cell color
+
 TLENGTH = 600
-CLENGTH = TLENGTH // 8
-BCOLOR2 = (217, 128, 255)
-BCOLOR = (179, 0, 255)
 NUM_ROWS = 8
-
-
-
-
+CLENGTH = TLENGTH // NUM_ROWS

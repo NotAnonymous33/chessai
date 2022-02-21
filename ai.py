@@ -86,8 +86,9 @@ class AI:
         best_board = min(boards, key=boards.get)
         best_board = best_board
         print(boards[best_board])
-        best_source = best_board.source_coord
-        best_move = best_board.moved_to
+        if boards[best_board] < lowest_eval:
+            best_source = best_board.source_coord
+            best_move = best_board.moved_to
 
         board.source_coord = best_source
         if best_move is None:

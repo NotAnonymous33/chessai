@@ -51,15 +51,18 @@ def main():
         data = json.load(read_file)
     depth = data["depth"]
     fps = data["fps"]
+    button_color = data["bcolor"]
+    bg_color = data["mcolor"]
+    highlight_button_color = data["bcolor2"]
     win = pygame.display.set_mode((TLENGTH, TLENGTH + CLENGTH))
     font = pygame.font.SysFont("Comic Sans MS", 30)
 
-    _PNAMES = ["b", "k", "n", "p", "q", "r"]
+    piece_names = ["b", "k", "n", "p", "q", "r"]
     images = {i: pygame.transform.scale(pygame.image.load("images/black/" + i + ".png"), (CLENGTH, CLENGTH)) for i in
-              _PNAMES}
+              piece_names}
     images.update(
         {i.upper(): pygame.transform.scale(pygame.image.load("images/white/" + i.upper() + ".png"), (CLENGTH, CLENGTH))
-         for i in _PNAMES})
+         for i in piece_names})
     ba = ["rook", "knight", "bishop", "queen"]
     nimages = {i: pygame.transform.scale(pygame.image.load("images/" + i + ".png"), (CLENGTH, CLENGTH)) for i in ba}
     drawer = Drawer(win, data, font, pygame, images, nimages)
@@ -74,24 +77,24 @@ def main():
     option = 0
 
     fen_buttons = [
-        Button(450, 200, 100, 50, 7, "FEN from clipboard"),  # FEN AI button
-        Button(450, 500, 100, 50, 8, "FEN")  # FEN player button
+        Button(450, 200, 100, 50, 7, "FEN", button_color, highlight_button_color),  # FEN AI button
+        Button(450, 500, 100, 50, 8, "FEN", button_color, highlight_button_color)  # FEN player button
     ]
     buttons = [
-        Button(100, 200, 300, 50, 1, "New Game vs AI"),  # new game button
-        Button(100, 300, 300, 50, 3, "Continue Game"),  # continue game button
-        Button(100, 400, 300, 50, 4, "Settings"),  # continue game button
-        Button(100, 500, 300, 50, 6, "New Game vs Player"),  # continue game button
+        Button(100, 200, 300, 50, 1, "New Game vs AI", button_color, highlight_button_color),  # new game button
+        Button(100, 300, 300, 50, 3, "Continue Game", button_color, highlight_button_color),  # continue game button
+        Button(100, 400, 300, 50, 4, "Settings", button_color, highlight_button_color),  # continue game button
+        Button(100, 500, 300, 50, 6, "New Game vs Player", button_color, highlight_button_color),  # continue game button
     ]
 
-    _quit = Button(525, 600, 75, 75, 2, "Quit")  # quit button
+    _quit = Button(525, 600, 75, 75, 2, "Quit", button_color, highlight_button_color)  # quit button
 
     settings = [
-        Button(300, 200, 50, 50, 4, "-"),  # decrease depth
-        Button(400, 200, 50, 50, 5, "+")  # increase depth
+        Button(300, 200, 50, 50, 4, "-", button_color, highlight_button_color),  # decrease depth
+        Button(400, 200, 50, 50, 5, "+", button_color, highlight_button_color)  # increase depth
     ]
 
-    end = Button(100, 100, 450, 50, 9, "")
+    end = Button(100, 100, 450, 50, 9, "", button_color, highlight_button_color)
 
     with open("game.txt", "w"):
         pass
@@ -113,7 +116,7 @@ def main():
     while running:
         # Menu
         if option == 0:
-            win.fill(MCOLOR)
+            win.fill(bg_color)
             text = title.render("Chess", True, (0, 0, 0))
             win.blit(text, (TLENGTH // 2 - 100, 100))
 
@@ -236,10 +239,9 @@ def main():
 
     data["depth"] = depth
     with open("settings.json", "w") as file:
-        json.dump(data, file)
+        json.dump(data, file, indent=2)
     pygame.quit()
 
 
 if __name__ == "__main__":
     main()
-
