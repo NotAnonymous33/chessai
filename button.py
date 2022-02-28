@@ -1,5 +1,3 @@
-from constants import *
-
 class Button:
     def __init__(self, x, y, width, height, ret, text, color, hcolor):
         self.x = x

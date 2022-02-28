@@ -9,7 +9,6 @@ class PieceColor(Enum):
 
 
 class PieceType(Enum):
-    # _settings_ = NoAlias
     Empty = 0
     Pawn = 100
     Rook = 500
@@ -77,4 +76,3 @@ class Cell:
 
     def __repr__(self):
         return f"({self.xcoor}, {self.ycoor})"
-

@@ -1,8 +1,6 @@
 from pieces import *
 from copy import copy
-import pickle
 import dis
-import gc
 import numpy as np
 
 pieces_order = [PieceType.Rook, PieceType.Knight, PieceType.Bishop, PieceType.Queen,
@@ -10,8 +8,8 @@ pieces_order = [PieceType.Rook, PieceType.Knight, PieceType.Bishop, PieceType.Qu
 pieces_order_char = ["R", "N", "B", "Q", "K", "B", "N", "R"]
 
 pawn_table = [[0, 0, 0, 0, 0, 0, 0, 0],
-              [50, 50, 50, 50, 50, 50, 50, 50],
-              [10, 10, 20, 30, 30, 20, 10, 10],
+              [100, 100, 100, 100, 100, 100, 100, 100],
+              [30, 30, 40, 60, 60, 40, 30, 30],
               [5, 5, 10, 25, 25, 10, 5, 5],
               [0, 0, 0, 20, 20, 0, 0, 0],
               [5, -5, -10, 0, 0, -10, -5, 5],
@@ -70,6 +68,7 @@ tables = {
                        PieceType.King: empty_table}
 }
 
+
 def to_fen(board):
     string = ""
     count = 0
@@ -122,8 +121,8 @@ def fen_converter(string):
 class Board:
     def __init__(self, depth=3, string=STRING):
         if depth == -1:
-            self.white_king = self.black_king = self.turn = self.half = self.full = self.source_coord = self.moved_to = \
-                self.highlighted_cells = self.check = self.quit = self.promote = self.ai = self.pieces = None
+            self.white_king = self.black_king = self.turn = self.half = self.full = self.source_coord = self.moved_to\
+                = self.highlighted_cells = self.check = self.quit = self.promote = self.ai = self.pieces = None
             return
         string = string.split()
         self.pieces = fen_converter(string[0])
@@ -159,8 +158,6 @@ class Board:
                     self.move_kings([PieceColor.White])
                 elif string[2].lower() == string[2]:  # upper case, black cannot castle
                     self.move_kings([PieceColor.Black])
-                else:
-                    pass  # axby something should go here
 
         self.source_coord = (-1, -1)
         self.moved_to = (-1, -1)

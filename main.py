@@ -84,7 +84,7 @@ def main():
         Button(100, 200, 300, 50, 1, "New Game vs AI", button_color, highlight_button_color),  # new game button
         Button(100, 300, 300, 50, 3, "Continue Game", button_color, highlight_button_color),  # continue game button
         Button(100, 400, 300, 50, 4, "Settings", button_color, highlight_button_color),  # continue game button
-        Button(100, 500, 300, 50, 6, "New Game vs Player", button_color, highlight_button_color),  # continue game button
+        Button(100, 500, 300, 50, 6, "New Game vs Player", button_color, highlight_button_color)  # continue game button
     ]
 
     _quit = Button(525, 600, 75, 75, 2, "Quit", button_color, highlight_button_color)  # quit button
@@ -125,9 +125,9 @@ def main():
                 if event.type == pygame.QUIT:
                     running = False
                 elif event.type == pygame.MOUSEBUTTONUP:
-                    vals = [button.click(*pos) for button in buttons]
-                    vals += [button.click(*pos) for button in fen_buttons]
-                    if (x := max(vals)) >= 0:
+                    values = [button.click(*pos) for button in buttons]
+                    values += [button.click(*pos) for button in fen_buttons]
+                    if (x := max(values)) >= 0:
                         option = x
 
                 for button in buttons:
@@ -182,7 +182,7 @@ def main():
             drawer.draw_button(_quit)
 
         # New game
-        elif option == 1 or option == 6 or option == 7 or option == 8:
+        elif option in (1, 6, 7, 8):
             if option == 1:
                 board = Board(depth=depth)
                 ai = AI(depth)
@@ -205,7 +205,7 @@ def main():
 
         # Settings
         elif option == 4:
-            win.fill(MCOLOR)
+            win.fill(bg_color)
             text = title.render("Settings", True, (0, 0, 0))
             win.blit(text, (TLENGTH // 2 - 150, 100))
             depth_text = normal.render(f"{depth = }", True, (0, 0, 0))

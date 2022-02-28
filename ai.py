@@ -71,7 +71,6 @@ class AI:
                                 best_move = move
                                 best_promoting_move = promoting_move
                     else:
-                        # axby add processes here, add next for loop
                         boards.append(temp_board)
                         # evaluation = self.minimax(temp_board)
                         # if evaluation < lowest_eval:
@@ -153,14 +152,14 @@ class AI:
                                     promoting_eval = self.minimax(promoting_temp_board, 1, white, alpha, beta)
 
                                     highest_promoting_eval = max(promoting_eval, highest_promoting_eval)
-                                eval = highest_promoting_eval
+                                _eval = highest_promoting_eval
                             elif temp_board.quit:
-                                eval = temp_board.evaluate()
+                                _eval = temp_board.evaluate()
                             else:
-                                eval = self.minimax(temp_board, depth - 1, not white, alpha, beta)
+                                _eval = self.minimax(temp_board, depth - 1, not white, alpha, beta)
 
-                            max_eval = max(max_eval, eval)
-                            alpha = max(alpha, eval)
+                            max_eval = max(max_eval, _eval)
+                            alpha = max(alpha, _eval)
                             if beta <= alpha:
                                 return max_eval
             return max_eval
@@ -184,13 +183,13 @@ class AI:
                                 promoting_temp_board.move_piece(*promoting_move, True)
                                 promoting_eval = self.minimax(promoting_temp_board, 1, white, alpha, beta)
                                 lowest_promoting_eval = min(promoting_eval, lowest_promoting_eval)
-                            eval = lowest_promoting_eval
+                            _eval = lowest_promoting_eval
                         elif temp_board.quit:
-                            eval = temp_board.evaluate()
+                            _eval = temp_board.evaluate()
                         else:
-                            eval = self.minimax(temp_board, depth - 1, not white, alpha, beta)
-                        min_eval = min(min_eval, eval)
-                        beta = min(beta, eval)
+                            _eval = self.minimax(temp_board, depth - 1, not white, alpha, beta)
+                        min_eval = min(min_eval, _eval)
+                        beta = min(beta, _eval)
                         if beta <= alpha:
                             return min_eval
         return min_eval
