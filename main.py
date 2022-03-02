@@ -159,6 +159,8 @@ def main():
                         end.text += ". Black has won"
                 else:
                     end.text += " in stalemate"
+                    if board.half == 50:
+                        end.text += ". 50 move rule"
 
             elif board.turn == -1 and board.ai:
                 ai.move(board)

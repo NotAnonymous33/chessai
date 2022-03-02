@@ -3,10 +3,6 @@ from copy import copy
 import dis
 import numpy as np
 
-pieces_order = [PieceType.Rook, PieceType.Knight, PieceType.Bishop, PieceType.Queen,
-                PieceType.King, PieceType.Bishop, PieceType.Knight, PieceType.Rook]
-pieces_order_char = ["R", "N", "B", "Q", "K", "B", "N", "R"]
-
 pawn_table = [[0, 0, 0, 0, 0, 0, 0, 0],
               [100, 100, 100, 100, 100, 100, 100, 100],
               [30, 30, 40, 60, 60, 40, 30, 30],
@@ -200,8 +196,6 @@ class Board:
         if y % 7 == 0 and self.pieces[y][x].piece_type == PieceType.Pawn:
             self.highlight_cells(True)
             self.move_piece(xc, yc, True)
-            # print(f"{self.turn=}")
-            # self.reset_source()
 
         if not self.promote and (xc, yc) in self.highlighted_cells:
             self.move_piece(xc, yc, True)
@@ -209,13 +203,15 @@ class Board:
         with open("game.txt", "a") as file:
             file.write(to_fen(self) + "\n")
         with open("pgn.txt", "a") as file:
-
             if yc == 8:
                 line = ""
             else:
-                line = f"{self.full}.{self.pieces[yc][xc].image}{chr(xc + 97)}{8 - yc} "
+                if self.turn == 1:
+                    line = f"{self.pieces[yc][xc].image}{chr(xc + 97)}{8 - yc} "
+                else:
+                    line = f"{self.full}.{self.pieces[yc][xc].image}{chr(xc + 97)}{8 - yc} "
+                    self.full += 1
             file.write(line)
-            self.full += 1
 
         if not self.promote:
             self.reset_source()
@@ -440,6 +436,8 @@ class Board:
                     self.pieces[y][2].moved = True
                     self.pieces[y][0] = Piece()
 
+            if self.pieces[y][x].piece_type != PieceType.Empty or self.pieces[py][px].piece_type == PieceType.Pawn:
+                self.half = 0
             self.pieces[y][x] = self.pieces[py][px]
             self.pieces[y][x].moved = True
             self.pieces[py][px] = Piece()  # set the source piece to 0
@@ -449,6 +447,9 @@ class Board:
             self.source_coord = current
 
         self.turn *= -1
+        self.half += 1
+        if self.half == 50:
+            self.quit = True
 
         if self.check and first:
             self.check_checkmate()
