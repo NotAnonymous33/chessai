@@ -270,35 +270,14 @@ class Board:
                 self.highlighted_cells.add((x + 1, y - self.turn))
 
     def highlight_bishop(self):
-        self.check_bishop(1, -1)  # top right
-        self.check_bishop(-1, -1)  # top left
-        self.check_bishop(1, 1)  # bottom right
-        self.check_bishop(-1, 1)  # bottom left
-
-    def check_bishop(self, d2x, d2y):
-        x, y = self.source_coord
-        dx, dy = d2x, d2y
-        stop = False
-        while 0 <= x + dx <= 7 and 0 <= y + dy <= 7 and not stop:
-            if self.pieces[y + dy][x + dx].color.value is self.turn * -1:
-                stop = True
-                self.highlighted_cells.add((x + dx, y + dy))
-            elif self.pieces[y + dy][x + dx].color.value is self.turn:
-                stop = True
-            else:
-                self.highlighted_cells.add((x + dx, y + dy))
-            dy += d2y
-            dx += d2x
+        directions = [(1, -1), (-1, -1), (1, 1), (-1, 1)]
+        for direction in directions:
+            self.check_direction(*direction)
 
     def highlight_knight(self):
-        self.check_knight(2, -1)  # 2 right 1 up
-        self.check_knight(2, 1)  # 2 right 1 down
-        self.check_knight(1, -2)  # 1 right 2 up
-        self.check_knight(1, 2)  # 1 right 2 down
-        self.check_knight(-2, -1)  # 2 left 1 up
-        self.check_knight(-2, 1)  # 2 left 1 down
-        self.check_knight(-1, -2)  # 1 left 2 up
-        self.check_knight(-1, 2)  # 1 left 2 down
+        possible_moves = [(2, -1), (2, 1), (1, -2), (1, 2), (-2, -1), (-2, 1), (-1, -2), (-1, 2)]
+        for move in possible_moves:
+            self.check_knight(*move)
 
     def check_knight(self, dx, dy):
         x, y = self.source_coord
@@ -314,12 +293,11 @@ class Board:
         self.highlight_bishop()
 
     def highlight_rook(self):
-        self.check_rook(1, 0)  # look right
-        self.check_rook(-1, 0)  # look left
-        self.check_rook(0, 1)  # look down
-        self.check_rook(0, -1)  # look up
+        directions = [(1, 0), (-1, 0), (0, 1), (0, -1)]
+        for direction in directions:
+            self.check_direction(*direction)
 
-    def check_rook(self, d2x, d2y):
+    def check_direction(self, d2x, d2y):
         dx = d2x
         dy = d2y
         x, y = self.source_coord
@@ -337,14 +315,9 @@ class Board:
                 dy += d2y
 
     def highlight_king(self):
-        self.check_king(0, -1)  # check up
-        self.check_king(0, 1)  # check down
-        self.check_king(-1, 0)  # check left
-        self.check_king(1, 0)  # check right
-        self.check_king(1, -1)  # check up right
-        self.check_king(-1, -1)  # check up left
-        self.check_king(1, 1)  # check down right
-        self.check_king(-1, 1)  # check down left
+        directions = [(0, -1), (0, 1), (-1, 0), (1, 0), (1, -1), (-1, -1), (1, 1), (-1, 1)]
+        for direction in directions:
+            self.check_king(*direction)
 
         x, y = self.source_coord
         # add castling to right
@@ -522,7 +495,6 @@ class Board:
             if king in self.highlighted_cells:
                 return True
         else:
-            # axby user permutations
             # check 2, 1 for knights
             if self.knight_check(prev, (2, 1)):
                 return True
