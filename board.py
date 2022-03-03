@@ -277,16 +277,7 @@ class Board:
     def highlight_knight(self):
         possible_moves = [(2, -1), (2, 1), (1, -2), (1, 2), (-2, -1), (-2, 1), (-1, -2), (-1, 2)]
         for move in possible_moves:
-            self.check_knight(*move)
-
-    def check_knight(self, dx, dy):
-        x, y = self.source_coord
-        if not (0 <= x + dx <= 7):
-            return
-        if not (0 <= y + dy <= 7):
-            return
-        if self.pieces[y + dy][x + dx].color.value is not self.turn:  # 2 right 1 up
-            self.highlighted_cells.add((x + dx, y + dy))
+            self.check_cell(*move)
 
     def highlight_queen(self):
         self.highlight_rook()
@@ -317,7 +308,7 @@ class Board:
     def highlight_king(self):
         directions = [(0, -1), (0, 1), (-1, 0), (1, 0), (1, -1), (-1, -1), (1, 1), (-1, 1)]
         for direction in directions:
-            self.check_king(*direction)
+            self.check_cell(*direction)
 
         x, y = self.source_coord
         # add castling to right
@@ -341,7 +332,7 @@ class Board:
             self.highlighted_cells.add((x - 2, y))
             self.highlighted_cells.add((x - 3, y))
 
-    def check_king(self, dx, dy):
+    def check_cell(self, dx, dy):
         x, y = self.source_coord
         if not (0 <= y + dy <= 7 and 0 <= x + dx <= 7):
             return
