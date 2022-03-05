@@ -339,9 +339,6 @@ class Board:
         if self.pieces[y + dy][x + dx].color.value is not self.turn:
             self.highlighted_cells.add((x + dx, y + dy))
 
-    def check_quit(self):
-        return self.quit
-
     def reset_source(self):
         self.source_coord = (-1, -1)
         self.highlighted_cells = set([])
@@ -395,7 +392,7 @@ class Board:
                     self.pieces[y][px + d].moved = True
                     self.pieces[y][rookx] = Piece()
 
-                if px - x == 3:
+                elif px - x == 3:
                     self.pieces[y][2] = self.pieces[y][0]
                     self.pieces[y][2].moved = True
                     self.pieces[y][0] = Piece()
@@ -542,18 +539,17 @@ class Board:
             return True
         return False
 
-    # @lru_cache(maxsize=None)
     def evaluate(self):
         if self.quit:
-            return self.turn * -9999999
+            if self.check:
+                return self.turn * -9999999
+            return 0
 
-        # add enumerate here
         e = 0
         for y, row in enumerate(self.pieces):
             for x, piece in enumerate(row):
                 weight = tables[piece.color][piece.piece_type][y][x]
                 e += piece.color.value * (piece.piece_type.value + weight)
-                # e += piece.color.value * piece.piece_type.value
         return e
 
     def copy_board(self):
