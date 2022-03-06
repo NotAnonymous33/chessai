@@ -1,7 +1,7 @@
 from pieces import *
 from copy import copy
 import dis
-import numpy as np
+from numpy import add
 
 pawn_table = [[0, 0, 0, 0, 0, 0, 0, 0],
               [100, 100, 100, 100, 100, 100, 100, 100],
@@ -117,7 +117,7 @@ def fen_converter(string):
 class Board:
     def __init__(self, depth=3, string=STRING):
         if depth == -1:
-            self.white_king = self.black_king = self.turn = self.half = self.full = self.source_coord = self.moved_to\
+            self.white_king = self.black_king = self.turn = self.half = self.full = self.source_coord = self.moved_to \
                 = self.highlighted_cells = self.check = self.quit = self.promote = self.ai = self.pieces = None
             return
         string = string.split()
@@ -429,7 +429,7 @@ class Board:
                 break
         else:
             checkmate, end the game
-        
+
         '''
 
     def check_checkmate(self):
@@ -443,18 +443,16 @@ class Board:
                     return
         self.quit = True
 
-    def knight_check(self, prev, direction):
-        self.source_coord = tuple(np.add(prev, direction))
-        if all(list(map(lambda z: 0 <= z <= 7, self.source_coord))):
-            sx, sy = self.source_coord
+    def knight_check(self, prev, move):
+        sx, sy = tuple(add(prev, move))
+        if 0 <= sx <= 7 and 0 <= sy <= 7:
             piece = self.pieces[sy][sx]
-            if piece.color.value is self.turn and piece.piece_type is PieceType.Knight:
+            if piece.piece_type is PieceType.Knight and piece.color.value is self.turn:
                 return True
         return False
 
     def line_check(self, king, prev, direction):
-        self.source_coord = np.add(prev, direction)
-        self.source_coord = np.add(prev, direction)
+        self.source_coord = add(prev, direction)
         while 0 <= self.source_coord[0] <= 7 and 0 <= self.source_coord[1] <= 7:
             cx, cy = self.source_coord
             if self.pieces[cy][cx].color.value == self.turn * -1:
@@ -463,7 +461,8 @@ class Board:
                 self.highlight_cells()
                 if king in self.highlighted_cells:
                     return True
-            self.source_coord = np.add(self.source_coord, direction)
+                return False
+            self.source_coord = add(self.source_coord, direction)
         return False
 
     def is_check(self, prev=None, current=None):
@@ -483,23 +482,10 @@ class Board:
             if king in self.highlighted_cells:
                 return True
         else:
-            # check 2, 1 for knights
-            if self.knight_check(prev, (2, 1)):
-                return True
-            if self.knight_check(prev, (2, -1)):
-                return True
-            if self.knight_check(prev, (-2, 1)):
-                return True
-            if self.knight_check(prev, (-2, -1)):
-                return True
-            if self.knight_check(prev, (1, 2)):
-                return True
-            if self.knight_check(prev, (1, -2)):
-                return True
-            if self.knight_check(prev, (-1, 2)):
-                return True
-            if self.knight_check(prev, (-1, -2)):
-                return True
+            knight_move = [(2, 1), (2, -1), (-2, 1), (-2, -1), (1, 2), (1, -2), (-1, 2), (-1, -2)]
+            for move in knight_move:
+                if self.knight_check(prev, move):
+                    return True
 
         px, py = prev
         # check column
@@ -522,21 +508,10 @@ class Board:
                 if king in self.highlighted_cells:
                     return True
 
-        # check top right
-        if self.line_check(king, prev, (1, -1)):
-            return True
-
-        # check top left
-        if self.line_check(king, prev, (-1, -1)):
-            return True
-
-        # check down right
-        if self.line_check(king, prev, (1, 1)):
-            return True
-
-        # check down left
-        if self.line_check(king, prev, (-1, 1)):
-            return True
+        directions = [(1, -1), (-1, -1), (1, 1), (-1, 1)]
+        for direction in directions:
+            if self.line_check(king, prev, direction):
+                return True
         return False
 
     def evaluate(self):
