@@ -2,10 +2,6 @@ from constants import *
 from timer import timer
 from board import to_fen
 import multiprocessing as mp
-import dis
-
-
-# https://stackoverflow.com/questions/6785226/pass-multiple-parameters-to-concurrent-futures-executor-map
 
 
 class AI:
@@ -72,15 +68,11 @@ class AI:
                                 best_promoting_move = promoting_move
                     else:
                         boards.append(temp_board)
-                        # evaluation = self.minimax(temp_board)
-                        # if evaluation < lowest_eval:
-                        #     lowest_eval = evaluation
-                        #     best_source = (col, row)
-                        #     best_move = move
-                        #     best_promoting_move = (-1, -1)
+
         pool = mp.Pool()
         data = pool.map(self.minimax, boards)
         pool.close()
+
         boards = dict(zip(boards, data))
         best_board = min(boards, key=boards.get)
         best_board = best_board
@@ -104,8 +96,6 @@ class AI:
         with open("pgn.txt", "a") as file:
             file.write(f"{board.pieces[y][x].image}{chr(x + 97)}{8 - y} ")
 
-    # @cache
-    # @lru_cache(maxsize=None)
     def minimax(self, board, depth=None, white=True, alpha=-99999999, beta=99999999) -> int:
         """
         white value = 1
@@ -193,3 +183,6 @@ class AI:
                         if beta <= alpha:
                             return min_eval
         return min_eval
+
+
+

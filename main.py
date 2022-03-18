@@ -47,8 +47,21 @@ def fen_check(string):
 def main():
     import pygame
     pygame.init()
-    with open("settings.json", "r") as read_file:
-        data = json.load(read_file)
+    try:
+        with open("settings.json", "r") as read_file:
+            data = json.load(read_file)
+    except FileNotFoundError:
+        data = {"depth": 4, "lcolor": [240, 230, 220], "rcolor": [199, 117, 61],
+                "mcolor": [220, 173, 140],
+                "scolor": [0, 255, 255],
+                "hrcolor": [0, 181, 98],
+                "hlcolor": [0, 255, 150],
+                "bcolor": [179, 0, 255],
+                "bcolor2": [217, 128, 255],
+                "mtcolor": [255, 0, 0],
+                "fps": 60
+                }
+
     depth = data["depth"]
     fps = data["fps"]
     button_color = data["bcolor"]
