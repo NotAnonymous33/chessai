@@ -62,11 +62,31 @@ def main():
                 "fps": 60
                 }
 
-    depth = data["depth"]
-    fps = data["fps"]
-    button_color = data["bcolor"]
-    bg_color = data["mcolor"]
-    highlight_button_color = data["bcolor2"]
+    try:
+        depth = data["depth"]
+    except KeyError:
+        depth = 4
+
+    try:
+        fps = data["fps"]
+    except KeyError:
+        fps = 60
+
+    try:
+        button_color = data["bcolor"]
+    except KeyError:
+        button_color = [179, 0, 255]
+
+    try:
+        bg_color = data["mcolor"]
+    except KeyError:
+        bg_color = [220, 173, 140]
+
+    try:
+        highlight_button_color = data["bcolor2"]
+    except KeyError:
+        highlight_button_color = [179, 0, 255]
+
     win = pygame.display.set_mode((TLENGTH, TLENGTH + CLENGTH))
     font = pygame.font.SysFont("Comic Sans MS", 30)
 
