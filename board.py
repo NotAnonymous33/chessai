@@ -195,6 +195,9 @@ class Board:
 
         if y % 7 == 0 and self.pieces[y][x].piece_type == PieceType.Pawn:
             self.highlight_cells(True)
+            if (xc, yc) not in self.highlighted_cells:
+                return
+
             self.move_piece(xc, yc, True)
 
         if not self.promote and (xc, yc) in self.highlighted_cells:
@@ -244,6 +247,7 @@ class Board:
                     new_moves.add(move)
             self.highlighted_cells = new_moves
         self.highlighted_cells.discard((x, y))
+
 
     def highlight_pawn(self):
         x, y = self.source_coord
@@ -354,6 +358,8 @@ class Board:
             self.pieces[py][px] = Piece()
             self.source_coord = (x, y)
             self.promote = True
+
+
             self.highlight_cells(True)
             return
             # get input

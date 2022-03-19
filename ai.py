@@ -37,7 +37,7 @@ class AI:
         lowest_eval = 99999999
         best_move = None
         best_promoting_move = (-1, -1)
-        boards = []
+        boards = set([])
         for row in range(NUM_ROWS)[::-1]:
             for col in range(NUM_ROWS)[::-1]:
                 if board.pieces[row][col].color.value != -1:
@@ -60,26 +60,29 @@ class AI:
                         for promoting_move in temp_board.highlighted_cells:
                             promoting_temp_board = temp_board.copy_board()
                             promoting_temp_board.move_piece(*promoting_move, True)
+
                             promoting_eval = self.minimax(promoting_temp_board)
                             if promoting_eval < lowest_eval:
                                 lowest_eval = promoting_eval
                                 best_source = (col, row)
                                 best_move = move
                                 best_promoting_move = promoting_move
+
                     else:
-                        boards.append(temp_board)
+                        boards.add(temp_board)
 
         pool = mp.Pool()
         data = pool.map(self.minimax, boards)
         pool.close()
 
-        boards = dict(zip(boards, data))
-        best_board = min(boards, key=boards.get)
-        best_board = best_board
-        print(boards[best_board])
-        if boards[best_board] < lowest_eval:
-            best_source = best_board.source_coord
-            best_move = best_board.moved_to
+        if boards != set([]):
+            boards = dict(zip(boards, data))
+            best_board = min(boards, key=boards.get)
+            best_board = best_board
+            print(boards[best_board])
+            if boards[best_board] < lowest_eval:
+                best_source = best_board.source_coord
+                best_move = best_board.moved_to
 
         board.source_coord = best_source
         if best_move is None:
