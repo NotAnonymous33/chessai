@@ -34,7 +34,7 @@ class AI:
 
         """
         best_source = (0, 0)
-        lowest_eval = 99999999
+        lowest_eval = 999999999
         best_move = None
         best_promoting_move = (-1, -1)
         boards = []
@@ -75,10 +75,9 @@ class AI:
         data = pool.map(self.minimax, boards)
         pool.close()
 
-        if boards != []:
+        if boards:
             boards = dict(zip(boards, data))
             best_board = min(boards, key=boards.get)
-            best_board = best_board
             print(boards[best_board])
             if boards[best_board] < lowest_eval:
                 best_source = best_board.source_coord
@@ -86,7 +85,7 @@ class AI:
                 best_promoting_move = (-1, -1)
 
         board.source_coord = best_source
-        if best_move is None:
+        if not boards:
             board.quit = True
             board.reset_source()
             return
