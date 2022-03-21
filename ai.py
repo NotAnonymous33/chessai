@@ -75,7 +75,7 @@ class AI:
         data = pool.map(self.minimax, boards)
         pool.close()
 
-        if boards != set([]):
+        if boards != []:
             boards = dict(zip(boards, data))
             best_board = min(boards, key=boards.get)
             best_board = best_board
@@ -187,6 +187,3 @@ class AI:
                         if beta <= alpha:
                             return min_eval
         return min_eval
-
-
-

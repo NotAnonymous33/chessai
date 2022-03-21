@@ -128,7 +128,7 @@ def fen_converter(string):
 class Board:
     def __init__(self, depth=3, string=STRING):
         if depth == -1:
-            self.white_king = self.black_king = self.turn = self.half = self.full = self.source_coord = self.moved_to \
+            self.white_king = self.black_king = self.turn = self.half = self.full = self.source_coord = self.moved_to\
                 = self.highlighted_cells = self.check = self.quit = self.promote = self.ai = self.pieces = None
             return
         string = string.split()
@@ -259,7 +259,6 @@ class Board:
             self.highlighted_cells = new_moves
         self.highlighted_cells.discard((x, y))
 
-
     def highlight_pawn(self):
         x, y = self.source_coord
         if y % 7 == 0:
@@ -369,8 +368,6 @@ class Board:
             self.pieces[py][px] = Piece()
             self.source_coord = (x, y)
             self.promote = True
-
-
             self.highlight_cells(True)
             return
             # get input
@@ -446,7 +443,7 @@ class Board:
                 break
         else:
             checkmate, end the game
-
+        
         '''
 
     def check_checkmate(self):
@@ -469,9 +466,8 @@ class Board:
         return False
 
     def line_check(self, king, prev, direction):
-        self.source_coord = add(prev, direction)
-        while 0 <= self.source_coord[0] <= 7 and 0 <= self.source_coord[1] <= 7:
-            cx, cy = self.source_coord
+        cx, cy = self.source_coord = add(prev, direction)
+        while 0 <= cx <= 7 and 0 <= cy <= 7:
             if self.pieces[cy][cx].color.value == self.turn * -1:
                 return False
             if self.pieces[cy][cx].color.value != 0:
@@ -479,7 +475,8 @@ class Board:
                 if king in self.highlighted_cells:
                     return True
                 return False
-            self.source_coord = add(self.source_coord, direction)
+            cx, cy = self.source_coord = add(self.source_coord, direction)
+
         return False
 
     def is_check(self, prev=None, current=None):
