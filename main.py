@@ -248,7 +248,7 @@ def main():
             win.fill(bg_color)
             text = title.render("Settings", True, (0, 0, 0))
             win.blit(text, (TLENGTH // 2 - 150, 100))
-            depth_text = normal.render(f"{depth = }", True, (0, 0, 0))
+            depth_text = normal.render(f"difficulty = {depth}", True, (0, 0, 0))
             win.blit(depth_text, (100, 200))
 
             for event in pygame.event.get():

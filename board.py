@@ -50,6 +50,17 @@ queen_table = [[-20, -10, -10, -5, -5, -10, -10, -20],
 
 empty_table = [[0 for i in range(8)] for j in range(8)]
 
+enemy_king_table = [
+    [200, 100, 100, 100, 100, 100, 100, 200],
+    [100,  75,  50,  50,  50,  50,  75, 100],
+    [100,  50,  25,  25,  25,  25,  50, 100],
+    [100,  50,  25,   0,   0,  25,  50, 100],
+    [100,  50,  25,   0,   0,  25,  50, 100],
+    [100,  50,  25,  25,  25,  25,  50, 100],
+    [100,  75,  50,  50,  50,  50,  75, 100],
+    [200, 100, 100, 100, 100, 100, 100, 200]
+]
+
 tables = {
     PieceColor.White: {PieceType.Pawn: pawn_table, PieceType.Knight: knight_table, PieceType.Bishop: bishop_table,
                        PieceType.Rook: rook_table, PieceType.Queen: queen_table, PieceType.Empty: empty_table,
@@ -527,10 +538,19 @@ class Board:
             return 0
 
         e = 0
+        t = 48000
         for y, row in enumerate(self.pieces):
             for x, piece in enumerate(row):
+                if piece.color.value == 0: continue
                 weight = tables[piece.color][piece.piece_type][y][x]
                 e += piece.color.value * (piece.piece_type.value + weight)
+                t -= abs(piece.piece_type.value)
+        if self.turn == 1:
+            kx, ky = self.black_king
+        else:
+            kx, ky = self.white_king
+        e += (enemy_king_table[ky][kx] * t * self.turn) // 8000
+
         return e
 
     def copy_board(self):
