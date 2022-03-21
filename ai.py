@@ -85,10 +85,7 @@ class AI:
                 best_promoting_move = (-1, -1)
 
         board.source_coord = best_source
-        if not boards:
-            board.quit = True
-            board.reset_source()
-            return
+
         board.move_piece(*best_move, True)
         if best_promoting_move != (-1, -1):
             board.move_piece(*best_promoting_move, True)

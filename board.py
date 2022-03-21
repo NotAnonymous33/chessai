@@ -426,9 +426,9 @@ class Board:
         if self.half == 50:
             self.quit = True
 
-        if self.check and first:
+        if first:
             self.check_checkmate()
-            self.source_coord = current
+
 
         '''
         If king is under attack, check
