@@ -7,22 +7,6 @@ from ai import AI
 import json
 
 
-# 3k4/8/8/8/8/4R3/1K5p/8 testing AI promoting
-# https://www.youtube.com/watch?v=6r_VKSdpRH8
-# rnbqk1nr/ppp2ppp/8/4P3/1BP5/8/PP3pPP/RN1QKBNR testing yt vid - move king up 1
-# 3k4/R7/8/8/8/4R3/7p/2RK4 testing promoting
-# 8/7P/8/5k2/8/8/8/1K6 testing user promoting
-# 8/5P2/2b5/4k3/8/8/1K6/8 testing user promoting 2
-# 4k2r/R7/R7/R7/R7/R7/R7/K2R1R2 castling test with lots of rooks
-# 5k2/8/8/2r5/8/P2Q4/1K2p1Q1/8 testing decision making with castling
-# rnbqk1nr/pppppp1p/6P1/8/8/8/PPPPPP1P/RNBQKBNR promoting and taking piece
-# 1nb1kb1r/2p1rppp/p4n2/1p6/2pqPB2/2N2BQ1/PP3PPP/R3R1K1 testing is_check speed improvement
-# 8/1RP5/N1P5/1b2P3/k2Br3/4Pp1K/5p1b/5N2 w - - 0 1 new bug
-# 3kq3/8/8/8/8/8/8/3K4 check
-# 1k4r1/5r2/8/8/7K/8/8/8 checkmate - ai wins
-# 6k1/5p2/6p1/8/7p/8/6PP/7K w - - 0 1 testing
-# 8/8/8/5RB1/2pk1K2/3r4/8/8 - checkmate testing
-
 def fen_check(string):
     string = string.split()
     if len(string) == 1 and string[0].count("/") == 7:
@@ -51,7 +35,8 @@ def main():
         with open("settings.json", "r") as read_file:
             data = json.load(read_file)
     except FileNotFoundError:
-        data = {"depth": 4, "lcolor": [240, 230, 220], "rcolor": [199, 117, 61],
+        data = {"depth": 4, "lcolor": [240, 230, 220],
+                "rcolor": [199, 117, 61],
                 "mcolor": [220, 173, 140],
                 "scolor": [0, 255, 255],
                 "hrcolor": [0, 181, 98],
