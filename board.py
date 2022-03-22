@@ -426,8 +426,9 @@ class Board:
         if self.half == 50:
             self.quit = True
 
-        if first:
+        if self.check and first:
             self.check_checkmate()
+            self.source_coord = current
 
 
         '''
@@ -546,6 +547,7 @@ class Board:
             kx, ky = self.black_king
         else:
             kx, ky = self.white_king
+        e = (e*(8000-t))//8000
         e += (enemy_king_table[ky][kx] * t * self.turn) // 8000
 
         return e
