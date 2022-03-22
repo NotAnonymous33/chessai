@@ -99,6 +99,7 @@ def main():
     running = True
     option = 0
 
+    # create buttons
     fen_buttons = [
         Button(450, 200, 100, 50, 7, "FEN", button_color, highlight_button_color),  # FEN AI button
         Button(450, 500, 100, 50, 8, "FEN", button_color, highlight_button_color)  # FEN player button
@@ -119,12 +120,12 @@ def main():
 
     end = Button(100, 100, 450, 50, 9, "", button_color, highlight_button_color)
 
+    # creating text files
     with open("game.txt", "w"):
         pass
     with open("pgn.txt", "w"):
         pass
 
-    # game loop
     # 0 ... Menu
     # 1 ... Game
     # 2 ... Quit
@@ -136,6 +137,7 @@ def main():
     # 8 ... new game vs player with fen
     # 9 ... end of game
 
+    # game loop
     while running:
         # Menu
         if option == 0:
@@ -262,6 +264,7 @@ def main():
         pygame.display.flip()
         clock.tick(fps)
 
+    # write final settings to json file
     data["depth"] = depth
     with open("settings.json", "w") as file:
         json.dump(data, file, indent=2)

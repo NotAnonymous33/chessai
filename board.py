@@ -1,6 +1,5 @@
 from pieces import *
 from copy import copy
-import dis
 from numpy import add
 
 pawn_table = [[0, 0, 0, 0, 0, 0, 0, 0],
@@ -61,6 +60,7 @@ enemy_king_table = [
     [200, 100, 100, 100, 100, 100, 100, 200]
 ]
 
+# piece tables
 tables = {
     PieceColor.White: {PieceType.Pawn: pawn_table, PieceType.Knight: knight_table, PieceType.Bishop: bishop_table,
                        PieceType.Rook: rook_table, PieceType.Queen: queen_table, PieceType.Empty: empty_table,
@@ -127,7 +127,7 @@ def fen_converter(string):
 
 class Board:
     def __init__(self, depth=3, string=STRING):
-        if depth == -1:
+        if depth == -1:  # if there is no AI
             self.white_king = self.black_king = self.turn = self.half = self.full = self.source_coord = self.moved_to\
                 = self.highlighted_cells = self.check = self.quit = self.promote = self.ai = self.pieces = None
             return
@@ -166,6 +166,7 @@ class Board:
                 elif string[2].lower() == string[2]:  # upper case, black cannot castle
                     self.move_kings([PieceColor.Black])
 
+        # setting default values
         self.source_coord = (-1, -1)
         self.moved_to = (-1, -1)
         self.highlighted_cells = set([])
@@ -204,6 +205,7 @@ class Board:
                 self.reset_source()
             return
 
+        # if a pawn is being promoted
         if y % 7 == 0 and self.pieces[y][x].piece_type == PieceType.Pawn:
             self.highlight_cells(True)
             if (xc, yc) not in self.highlighted_cells:
@@ -370,8 +372,6 @@ class Board:
             self.promote = True
             self.highlight_cells(True)
             return
-            # get input
-            # turn the piece into whatever type it should be
 
         if self.promote:
             if x == 0:
@@ -481,8 +481,6 @@ class Board:
         return False
 
     def is_check(self, prev=None, current=None):
-        # maybe only checking col row diagonals of king will be faster
-        # change to only check relevant pieces on board
         if self.turn == 1:
             king = self.black_king
         else:
@@ -547,8 +545,8 @@ class Board:
             kx, ky = self.black_king
         else:
             kx, ky = self.white_king
-        e = (e*(8000-t))//8000
-        e += (enemy_king_table[ky][kx] * t * self.turn) // 8000
+        e = (e*(8000-t))//8000  # weighting of pieces lowers as game progresses
+        e += (enemy_king_table[ky][kx] * t * self.turn) // 8000  # weighting of kings increase as game progresses
 
         return e
 

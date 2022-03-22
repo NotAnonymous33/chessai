@@ -10,11 +10,10 @@ class AI:
 
     @timer
     def move(self, board):
-        # find the best move and move it
+        # find the best move
+        # make the move
 
         """
-        ________________________________________
-        |Actual stuff which is meant to happen
         ---------------------------------------
         | 1. For each piece
         | 2. For each move the piece can make
