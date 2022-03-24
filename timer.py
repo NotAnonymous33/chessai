@@ -5,6 +5,6 @@ def timer(f):
         start = perf_counter()
         value = f(*args, **kwargs)
         elapsed = perf_counter() - start
-        print(elapsed)
+        print(round(elapsed, 3))
         return value
     return wrapper

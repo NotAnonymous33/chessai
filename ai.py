@@ -41,7 +41,6 @@ class AI:
             for col in range(NUM_ROWS)[::-1]:
                 if board.pieces[row][col].color.value != -1:
                     continue
-                print(col, row)
                 board.reset_source()
                 board.source_coord = (col, row)
                 board.highlight_cells(True)
@@ -49,7 +48,6 @@ class AI:
                 highlighted = list(board.highlighted_cells)
                 if not len(highlighted):
                     continue
-                print(highlighted)
 
                 for move in highlighted:
                     temp_board = board.copy_board()
@@ -77,7 +75,6 @@ class AI:
         if boards:
             boards = dict(zip(boards, data))
             best_board = min(boards, key=boards.get)
-            print(boards[best_board])
             if boards[best_board] < lowest_eval:
                 best_source = best_board.source_coord
                 best_move = best_board.moved_to
@@ -94,6 +91,7 @@ class AI:
         x, y = best_move
         with open("pgn.txt", "a") as file:
             file.write(f"{board.pieces[y][x].image}{chr(x + 97)}{8 - y} ")
+
 
     def minimax(self, board, depth=None, white=True, alpha=-99999999, beta=99999999) -> int:
         """

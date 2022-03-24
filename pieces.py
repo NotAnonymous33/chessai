@@ -65,7 +65,9 @@ class Piece:
         return new_piece
 
     def __repr__(self):
-        return f"{self.color} {self.piece_type} {self.moved=}"
+        color = str(self.color).split(".")[1]
+        type = str(self.piece_type).split(".")[1]
+        return f"{color}{type}"
 
 
 class Cell:
